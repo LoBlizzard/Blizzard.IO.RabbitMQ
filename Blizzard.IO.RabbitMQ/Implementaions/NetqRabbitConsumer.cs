@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Blizzard.IO.Core;
 using Blizzard.IO.RabbitMQ.Entities;
 using EasyNetQ;
@@ -36,11 +37,42 @@ namespace Blizzard.IO.RabbitMQ.Implementaions
         {
             _netqBus.Advanced.Consume(_sourceQueue, (messageBytes, messageProperties, messageInfo) =>
             {
+                TData data;
                 if (_concreteTypeDeserializer != null)
                 {
-                    //TData data = _concreteTypeDeserializer.Deserialize()
+                    Type messageObjectType = messageProperties.Type.GetType();
+                    data = _concreteTypeDeserializer.Deserialize(messageBytes, messageObjectType);
                 }
-            })
+                else
+                {
+                    data = _deserializer.Deserialize(messageBytes);
+                }
+                RabbitMessageProperties properties = ConvertMassageProperties(messageProperties);
+
+                MessageReceived?.Invoke(data);
+                MessageWithMetadataReceived?.Invoke(data, properties);
+            });
+        }
+
+        private RabbitMessageProperties ConvertMassageProperties(MessageProperties messageProperties)
+        {
+            return new RabbitMessageProperties
+            {
+                DeliveryMode = messageProperties.DeliveryMode,
+                Type = messageProperties.Type,
+                Headers = messageProperties.Headers as Dictionary<string, object>,
+                ContentType = messageProperties.ContentType,
+                ContentEncoding = messageProperties.ContentEncoding,
+                MessageId = messageProperties.MessageId,
+                CorellationId = messageProperties.CorrelationId,
+                ReplyTo = messageProperties.ReplyTo,
+                Timestamp = DateTime.FromBinary(messageProperties.Timestamp),
+                UserId = messageProperties.UserId,
+                AddId = messageProperties.AppId,
+                ClusterId = messageProperties.ClusterId,
+                Expiration = messageProperties.Expiration,
+                Priority = messageProperties.Priority
+            };
         }
 
         public void Stop()
