@@ -1,0 +1,4 @@
+[submodule "Blizzard.IO.Core"]
+	path = Blizzard.IO.Core
+	url = https://github.com/LoBlizzard/Blizzard.IO.Core.git
+	branch = dev
