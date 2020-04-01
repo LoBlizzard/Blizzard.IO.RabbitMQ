@@ -11,6 +11,7 @@ namespace Blizzard.IO.RabbitMQ
         private readonly IBus _netqBus;
         private readonly ISerializer<TData> _serializer;
         private readonly IExchange _destinationExchange;
+        private readonly IConverter<RabbitMessageProperties, MessageProperties> _rabbitMessagePropertiesToMessagePropertiesConverter;
         private readonly string _routingKey;
         private readonly bool _isAbstract;
 
@@ -25,6 +26,15 @@ namespace Blizzard.IO.RabbitMQ
 
             _isAbstract = isAbstract;
             _routingKey = routingKey;
+            _rabbitMessagePropertiesToMessagePropertiesConverter = new RabbitPropertiesConverter();
+        }
+
+        public void Publish(TData data)
+        {
+            byte[] body = _serializer.Serialize(data);
+            MessageProperties netqMessageProperties = new MessageProperties();
+            EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
+            _netqBus.Advanced.Publish(_destinationExchange, _routingKey, false, netqMessageProperties, body);
         }
 
         public void Publish(TData data, string routingKey)
@@ -36,29 +46,21 @@ namespace Blizzard.IO.RabbitMQ
             _netqBus.Advanced.Publish(_destinationExchange, routingKey, false, netqMessageProperties, body);
         }
 
-        public void Publish(TData data, RabbitMessageProperties messageProperties, string routingKey)
+        public void Publish(TData data, RabbitMessageProperties rabbitMessageProperties)
         {
             byte[] body = _serializer.Serialize(data);
-            MessageProperties netqMessageProperties = ConvertRabbitMessageProperties(messageProperties);
+            MessageProperties netqMessageProperties = _rabbitMessagePropertiesToMessagePropertiesConverter.Convert(rabbitMessageProperties);
+            EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
+            _netqBus.Advanced.Publish(_destinationExchange, _routingKey, false, netqMessageProperties, body);
+        }
+
+        public void Publish(TData data, RabbitMessageProperties rabbitMessageProperties, string routingKey)
+        {
+            byte[] body = _serializer.Serialize(data);
+            MessageProperties netqMessageProperties = _rabbitMessagePropertiesToMessagePropertiesConverter.Convert(rabbitMessageProperties);
             EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
 
             _netqBus.Advanced.Publish(_destinationExchange, routingKey, false, netqMessageProperties, body);
-        }
-
-        public void Publish(TData data, RabbitMessageProperties metadata)
-        {
-            byte[] body = _serializer.Serialize(data);
-            MessageProperties netqMessageProperties = ConvertRabbitMessageProperties(metadata);
-            EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
-            _netqBus.Advanced.Publish(_destinationExchange, _routingKey, false, netqMessageProperties, body);
-        }
-
-        public void Publish(TData data)
-        {
-            byte[] body = _serializer.Serialize(data);
-            MessageProperties netqMessageProperties = new MessageProperties();
-            EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
-            _netqBus.Advanced.Publish(_destinationExchange, _routingKey, false, netqMessageProperties, body);
         }
 
         private void EnrichWithTypeIfAbstract(MessageProperties messageProperties, Type dataType)
@@ -67,28 +69,6 @@ namespace Blizzard.IO.RabbitMQ
             {
                 messageProperties.Type = dataType.ToString();
             }
-        }
-
-        private MessageProperties ConvertRabbitMessageProperties(RabbitMessageProperties rabbitMessageProperties)
-        {
-            return new MessageProperties()
-            {
-
-                DeliveryMode = rabbitMessageProperties.DeliveryMode,
-                Type = rabbitMessageProperties.Type,
-                Headers = rabbitMessageProperties.Headers,
-                ContentType = rabbitMessageProperties.ContentType,
-                ContentEncoding = rabbitMessageProperties.ContentEncoding,
-                MessageId = rabbitMessageProperties.MessageId,
-                CorrelationId = rabbitMessageProperties.CorellationId,
-                ReplyTo = rabbitMessageProperties.ReplyTo,
-                Timestamp = rabbitMessageProperties.Timestamp.Ticks,
-                UserId = rabbitMessageProperties.UserId,
-                AppId = rabbitMessageProperties.AddId,
-                ClusterId = rabbitMessageProperties.ClusterId,
-                Expiration = rabbitMessageProperties.Expiration,
-                Priority = rabbitMessageProperties.Priority
-            };
         }
     }
 }
