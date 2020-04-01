@@ -10,24 +10,24 @@ namespace Blizzard.IO.RabbitMQ
         IConverter<RabbitMessageProperties, MessageProperties>,
         IConverter<MessageProperties, RabbitMessageProperties>
     {
-        public MessageProperties Convert(RabbitMessageProperties messageProperties)
+        public MessageProperties Convert(RabbitMessageProperties rabbitMessageProperties)
         {
             return new MessageProperties
             {
-                DeliveryMode = messageProperties.DeliveryMode,
-                Type = messageProperties.Type,
-                Headers = messageProperties.Headers,
-                ContentType = messageProperties.ContentType,
-                ContentEncoding = messageProperties.ContentEncoding,
-                MessageId = messageProperties.MessageId,
-                CorrelationId = messageProperties.CorrelationId,
-                ReplyTo = messageProperties.ReplyTo,
-                Timestamp = messageProperties.Timestamp,
-                UserId = messageProperties.UserId,
-                AppId = messageProperties.AppId,
-                ClusterId = messageProperties.ClusterId,
-                Expiration = messageProperties.Expiration,
-                Priority = messageProperties.Priority
+                DeliveryMode = rabbitMessageProperties.DeliveryMode,
+                Type = rabbitMessageProperties.Type,
+                Headers = rabbitMessageProperties.Headers,
+                ContentType = rabbitMessageProperties.ContentType,
+                ContentEncoding = rabbitMessageProperties.ContentEncoding,
+                MessageId = rabbitMessageProperties.MessageId,
+                CorrelationId = rabbitMessageProperties.CorrelationId,
+                ReplyTo = rabbitMessageProperties.ReplyTo,
+                Timestamp = rabbitMessageProperties.Timestamp,
+                UserId = rabbitMessageProperties.UserId,
+                AppId = rabbitMessageProperties.AppId,
+                ClusterId = rabbitMessageProperties.ClusterId,
+                Expiration = rabbitMessageProperties.Expiration,
+                Priority = rabbitMessageProperties.Priority
             };
         }
 
