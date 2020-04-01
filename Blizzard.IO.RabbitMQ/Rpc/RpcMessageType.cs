@@ -1,6 +1,6 @@
 ﻿namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public enum RpcType
+    public enum RpcMessageType
     {
         Abstarct,
         Concrete

@@ -5,17 +5,18 @@ using ISerializer = Blizzard.IO.Core.Rpc.ISerializer;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public class NetqRabbitRpcConnection
+    public class NetqRabbitRpcConnection : INetqRpcRabbitConnection
     {
-        public readonly IBus RabbitBus;
-
+        public IBus RabbitBus { get; }
+        public RpcMessageType MessageType { get; }
         private readonly ISerializer _serializer;
 
         public NetqRabbitRpcConnection(RpcConfiguration configuration, string hostname, string username, string password, int heartBeat = 10, int preFetch = 50, ushort timeout = 10,
             bool publisherConfirms = false, bool persistent = true, string product = null, string platform = null, string virtualHost = null,
-            ISerializer serializer = null, RpcType rpcType = RpcType.Concrete)
+            ISerializer serializer = null, RpcMessageType rpcMessageType = RpcMessageType.Concrete)
         {
             _serializer = serializer;
+            MessageType = rpcMessageType;
             string connectionString = $"host={hostname};username={username};password={password};requestedHeartbeat={heartBeat};prefetchcount={heartBeat};" +
                 $"persistentMessages={persistent};publisherConfirms={publisherConfirms}";
             if (product != null)
@@ -33,16 +34,25 @@ namespace Blizzard.IO.RabbitMQ.Rpc
 
             RabbitBus = RabbitHutch.CreateBus(connectionString, registerer =>
             {
+                switch (rpcMessageType)
+                {
+                    case RpcMessageType.Abstarct:
+                        registerer.Register<IMessageSerializationStrategy, AbstractMessageSerializationStrategy>();
+                        break;
+                    case RpcMessageType.Concrete:
+                        registerer.Register<IMessageSerializationStrategy, ConcreteMessageSerializationStrategy>();
+                        break;
+                }
+
                 registerer.Register(configuration);
                 registerer.Register<IRpc, RpcRabbitWrapper>();
-                registerer.Register<IMessageSerializationStrategy, ConcreteMessageSerializationStrategy>();
                 registerer.Register(serializer);
             });
         }
 
-        public object GetObject(byte[] obj, Type type)
+        public T GetObject<T>(byte[] obj, Type type)
         {
-            return _serializer.Deserialize(obj, type);
+            return (T)_serializer.Deserialize(obj, type);
         }
     }
 }
