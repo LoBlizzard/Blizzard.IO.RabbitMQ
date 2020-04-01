@@ -1,5 +1,6 @@
 ﻿using Blizzard.IO.RabbitMQ.Entities;
 using EasyNetQ;
+using EasyNetQ.Topology;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -12,14 +13,45 @@ namespace Blizzard.IO.RabbitMQ.Tests
     public class NetqRabbitConfiguratorTests
     {
         private RabbitConfiguration _configuration;
-        private NetqRabbitConfigurator _netqRabbitConfigurator;
+        private RabbitExchange _exchange;
+        private RabbitQueue _queue;
+
         private Mock<IBus> _netqBusMock;
         private Mock<IAdvancedBus> _netqAdvancedBusMock;
         private Mock<ILogger<NetqRabbitConfigurator>> _loggerMock;
+        private NetqRabbitConfigurator _netqRabbitConfigurator;
 
         [SetUp]
         public void SetUp()
         {
+            _exchange = new RabbitExchange
+            {
+                Name = "EXCHANGE",
+                Type = RabbitExchangeType.Direct,
+                Passive = false,
+                Durable = false,
+                AutoDelete = false,
+                Internal = false,
+                AlternateExchange = "2",
+                Delayed = false
+            };
+
+            _queue = new RabbitQueue
+            {
+                Name = "QUEUE",
+                Passive = false,
+                Durable = false,
+                Exclusive = false,
+                AutoDelete = false,
+                PerQueueMessageTtl = 12,
+                Expires = 3,
+                MaxPriority = 4,
+                DeadLetterExchange = "are",
+                DeadLetterRoutingKey = "really...",
+                MaxLength = 10,
+                MaxLengthBytes = 1
+            };
+
             _configuration = new RabbitConfiguration
             {
                 Exchanges = new List<RabbitExchange>(),
@@ -39,79 +71,53 @@ namespace Blizzard.IO.RabbitMQ.Tests
         public void Configure_OnRabbitConfigurationNull_ShouldThrowNullArgumentException()
         {
             // Act + Assert
-            Assert.That(() => _netqRabbitConfigurator.Configure(null), Throws.TypeOf<ArgumentNullException>());
+            Assert.That(() => _netqRabbitConfigurator.Configure(null), Throws.TypeOf<NullReferenceException>());
         }
 
         [Test]
         public void Configure_OnRabbitExchangeFoundConfigurationExchanges_ShouldDeclareThatExchangePropertiesOnBus()
         {
             // Arrange
-            var exchange = new RabbitExchange
-            {
-                Name = "0",
-                Type = RabbitExchangeType.Direct,
-                Passive = false,
-                Durable = false,
-                AutoDelete = false,
-                Internal = false,
-                AlternateExchange = "2",
-                Delayed = false
-            };
-            _configuration.Exchanges.Add(exchange);
+            _configuration.Exchanges.Add(_exchange);
 
             // Act
             _netqRabbitConfigurator.Configure(_configuration);
 
             // Assert
             _netqAdvancedBusMock.Verify(bus => bus.ExchangeDeclare(
-                exchange.Name,
-                Helpers.ExchangeTypeToStringResolver[exchange.Type],
-                exchange.Passive,
-                exchange.Durable,
-                exchange.AutoDelete,
-                exchange.Internal,
-                exchange.AlternateExchange,
-                exchange.Delayed), Times.Once);
+                _exchange.Name,
+                Utilities.ExchangeTypeToStringResolver[_exchange.Type],
+                _exchange.Passive,
+                _exchange.Durable,
+                _exchange.AutoDelete,
+                _exchange.Internal,
+                _exchange.AlternateExchange,
+                _exchange.Delayed), Times.Once);
         }
 
         [Test]
         public void Configure_OnRabbitQueue_ShouldDeclareThatExchangesPropertiesOnBus()
         {
             // Arrange
-            var queue = new RabbitQueue
-            {
-                Name = "0",
-                Passive = false,
-                Durable = false,
-                Exclusive = false,
-                AutoDelete = false,
-                PerQueueMessageTtl = 12,
-                Expires = 3,
-                MaxPriority = 4,
-                DeadLetterExchange = "are",
-                DeadLetterRoutingKey = "really...",
-                MaxLength = 10,
-                MaxLengthBytes = 1
-            };
-            _configuration.Queues.Add(queue);
+            _configuration.Queues.Add(_queue);
 
             // Act
             _netqRabbitConfigurator.Configure(_configuration);
 
             // Assert
             _netqAdvancedBusMock.Verify(bus => bus.QueueDeclare(
-                queue.Name,
-                queue.Passive,
-                queue.Durable,
-                queue.Exclusive,
-                queue.AutoDelete,
-                queue.PerQueueMessageTtl,
-                queue.Expires,
-                queue.MaxPriority,
-                queue.DeadLetterExchange,
-                queue.DeadLetterRoutingKey,
-                queue.MaxLength,
-                queue.MaxLengthBytes), Times.Once);
+                _queue.Name,
+                _queue.Passive,
+                _queue.Durable,
+                _queue.Exclusive,
+                _queue.AutoDelete,
+                _queue.PerQueueMessageTtl,
+                _queue.Expires,
+                _queue.MaxPriority,
+                _queue.DeadLetterExchange,
+                _queue.DeadLetterRoutingKey,
+                _queue.MaxLength,
+                _queue.MaxLengthBytes), Times.Once);
         }
 
         [Test]
@@ -120,18 +126,25 @@ namespace Blizzard.IO.RabbitMQ.Tests
             // Arrange
             var binding = new RabbitBinding
             {
-                SourceName = "source",
-                DestName = "dest",
+                SourceName = "EXCHANGE",
+                DestName = "EXCHANGE",
                 RoutingKey = "/"
             };
+
+            _configuration.Exchanges.Add(_exchange);
+            _configuration.Exchanges.Add(_exchange);
             _configuration.ExchangeToExchangeBindings.Add(binding);
+
+            var netqExchange = new Exchange("EXCHANGE");
+            _netqAdvancedBusMock.Setup(bus => bus.ExchangeDeclare(It.IsAny<string>(), It.IsAny<string>(),It.IsAny<bool>(),
+                It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(),It.IsAny<string>(), It.IsAny<bool>())).Returns(netqExchange);
 
             // Act
             _netqRabbitConfigurator.Configure(_configuration);
 
             // Assert
             _netqAdvancedBusMock.Verify(bus => 
-                bus.Bind(binding.SourceName, binding.DestName, binding.RoutingKey), Times.Once);
+                bus.Bind(netqExchange, netqExchange, binding.RoutingKey), Times.Once);
         }
 
         [Test]
@@ -140,18 +153,30 @@ namespace Blizzard.IO.RabbitMQ.Tests
             // Arrange
             var binding = new RabbitBinding
             {
-                SourceName = "source",
-                DestName = "dest",
+                SourceName = "EXCHANGE",
+                DestName = "QUEUE",
                 RoutingKey = "/"
             };
+
+            _configuration.Exchanges.Add(_exchange);
+            _configuration.Queues.Add(_queue);
             _configuration.ExchangeToQueueBindings.Add(binding);
+
+            var netqExchange = new Exchange("EXCHANGE");
+            _netqAdvancedBusMock.Setup(bus => bus.ExchangeDeclare(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(),
+                It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<bool>())).Returns(netqExchange);
+
+           var netqQueue = new Queue("QUEUE", false);
+            _netqAdvancedBusMock.Setup(bus => bus.QueueDeclare(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(),
+                It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>())).Returns(netqQueue);
 
             // Act
             _netqRabbitConfigurator.Configure(_configuration);
 
             // Assert
             _netqAdvancedBusMock.Verify(bus =>
-                bus.Bind(binding.SourceName, binding.DestName, binding.RoutingKey), Times.Once);
+                bus.Bind(netqExchange, netqQueue, binding.RoutingKey), Times.Once);
         }
     }
 }

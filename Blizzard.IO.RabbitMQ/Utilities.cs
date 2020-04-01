@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Blizzard.IO.RabbitMQ
 {
-    public static class Helpers
+    public static class Utilities
     {
         public static Dictionary<RabbitExchangeType, string> ExchangeTypeToStringResolver = new Dictionary<RabbitExchangeType, string>
         {
