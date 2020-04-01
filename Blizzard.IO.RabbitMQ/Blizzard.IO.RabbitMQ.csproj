@@ -9,7 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Implementaions\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
 </Project>
