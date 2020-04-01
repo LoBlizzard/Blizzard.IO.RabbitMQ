@@ -6,7 +6,7 @@ namespace Blizzard.IO.RabbitMQ.Entities
     {
         public List<RabbitExchange> Exchanges { get; set; }
         public List<RabbitQueue> Queues { get; set; }
-        public List<(RabbitExchange, RabbitQueue, string)> ExchangeToQueueBindings { get; set; }
-        public List<(RabbitExchange, RabbitExchange, string)> ExchangeToExchangeBindings { get; set; }
+        public List<(string, string, string)> ExchangeToQueueBindings { get; set; }
+        public List<(string, string, string)> ExchangeToExchangeBindings { get; set; }
     }
 }
