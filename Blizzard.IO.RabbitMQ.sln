@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.Core", "Blizzar
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SubModules", "SubModules", "{7BD0B07F-CFEA-4AB7-9D42-A84278157B7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blizzard.IO.RabbitMQ.Tests", "Blizzard.IO.RabbitMQ.Tests\Blizzard.IO.RabbitMQ.Tests.csproj", "{52AAF175-8C8E-4898-8C02-F631BCFAFF24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{D2111278-8B66-43F4-8C69-71BDD9AB540E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2111278-8B66-43F4-8C69-71BDD9AB540E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2111278-8B66-43F4-8C69-71BDD9AB540E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52AAF175-8C8E-4898-8C02-F631BCFAFF24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52AAF175-8C8E-4898-8C02-F631BCFAFF24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52AAF175-8C8E-4898-8C02-F631BCFAFF24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52AAF175-8C8E-4898-8C02-F631BCFAFF24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
