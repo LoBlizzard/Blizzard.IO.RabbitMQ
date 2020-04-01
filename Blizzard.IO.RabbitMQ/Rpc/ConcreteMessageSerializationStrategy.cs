@@ -1,4 +1,4 @@
-﻿    using EasyNetQ;
+﻿using EasyNetQ;
 using System;
 using ISerializer = Blizzard.IO.Core.Rpc.ISerializer;
 
@@ -15,7 +15,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
 
         public IMessage DeserializeMessage(MessageProperties properties, byte[] body)
         {
-            return new Message<Func<Type,object>>(type=>_serializer.Deserialize(body, type), properties);
+            return new Message<Func<Type, object>>(type => _serializer.Deserialize(body, type), properties);
         }
 
         public SerializedMessage SerializeMessage(IMessage message)

@@ -1,4 +1,5 @@
-﻿using EasyNetQ;
+﻿using Blizzard.IO.RabbitMQ.Entities.Rpc;
+using EasyNetQ;
 using EasyNetQ.Producer;
 using EesyNetQRpc = EasyNetQ.Producer.Rpc;
 

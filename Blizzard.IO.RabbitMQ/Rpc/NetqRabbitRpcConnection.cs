@@ -1,21 +1,20 @@
-﻿using EasyNetQ;
+﻿using Blizzard.IO.RabbitMQ.Entities.Rpc;
+using EasyNetQ;
 using EasyNetQ.Producer;
 using System;
 using ISerializer = Blizzard.IO.Core.Rpc.ISerializer;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public class NetqRabbitRpcConnection : INetqRpcRabbitConnection
+    public class NetqRabbitRpcConnection : INetqRpcRabbitConnection<Func<Type, object>>
     {
         public IBus RabbitBus { get; }
         public RpcMessageType MessageType { get; }
-        private readonly ISerializer _serializer;
 
         public NetqRabbitRpcConnection(RpcConfiguration configuration, string hostname, string username, string password, int heartBeat = 10, int preFetch = 50, ushort timeout = 10,
             bool publisherConfirms = false, bool persistent = true, string product = null, string platform = null, string virtualHost = null,
             ISerializer serializer = null, RpcMessageType rpcMessageType = RpcMessageType.Concrete)
         {
-            _serializer = serializer;
             MessageType = rpcMessageType;
             string connectionString = $"host={hostname};username={username};password={password};requestedHeartbeat={heartBeat};prefetchcount={heartBeat};" +
                 $"persistentMessages={persistent};publisherConfirms={publisherConfirms}";
@@ -48,11 +47,6 @@ namespace Blizzard.IO.RabbitMQ.Rpc
                 registerer.Register<IRpc, RpcRabbitWrapper>();
                 registerer.Register(serializer);
             });
-        }
-
-        public T GetObject<T>(byte[] obj, Type type)
-        {
-            return (T)_serializer.Deserialize(obj, type);
         }
     }
 }
