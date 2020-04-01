@@ -25,12 +25,32 @@ namespace Blizzard.IO.RabbitMQ
             _nameToNetqQueue.Clear(); 
             DeclareExchanges(configuration.Exchanges);
             DeclareQueues(configuration.Queues);
-            DeclareExchangesToQueuesBindings(configuration.ExchangeToQueueBindings);
+            DeclareExchangeToQueueBindings(configuration.ExchangeToQueueBindings);
+            DeclareExchangeToExchangeBindings(configuration.ExchangeToExchangeBindings);
         }
 
-        private void DeclareExchangesToQueuesBindings(List<(RabbitExchange, RabbitQueue, string)> exchangeToQueueBindings)
+        private void DeclareExchangeToExchangeBindings(List<RabbitBinding> exchangeToExchangeBindings)
         {
-           
+            foreach (RabbitBinding binding in exchangeToExchangeBindings)
+            {
+                _netqBus.Advanced.Bind(
+                    _nameToNetqExchange[binding.SourceName],
+                    _nameToNetqExchange[binding.DestName],
+                    binding.RoutingKey
+                    );
+            }
+        }
+
+        private void DeclareExchangeToQueueBindings(List<RabbitBinding> exchangeToQueueBinding)
+        {
+            foreach (RabbitBinding binding in exchangeToQueueBinding)
+            {
+                _netqBus.Advanced.Bind(
+                    _nameToNetqExchange[binding.SourceName],
+                    _nameToNetqQueue[binding.DestName],
+                    binding.RoutingKey
+                    );
+            }
         }
 
         private void DeclareQueues(List<RabbitQueue> queues)
