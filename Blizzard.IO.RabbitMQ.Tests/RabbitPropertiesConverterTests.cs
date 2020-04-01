@@ -44,7 +44,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
             // Assert
             Assert.That(properties.DeliveryMode, Is.EqualTo(10));
             Assert.That(properties.Type, Is.EqualTo("0"));
-            Assert.That(properties.Headers, Is.EqualTo(new Dictionary<string, object>()));
+            Assert.That(properties.Headers, Is.EqualTo(netqRabbitProperties.Headers));
             Assert.That(properties.ContentType, Is.EqualTo("1"));
             Assert.That(properties.ContentEncoding, Is.EqualTo("2"));
             Assert.That(properties.MessageId, Is.EqualTo("3"));
@@ -86,7 +86,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
             // Assert
             Assert.That(properties.DeliveryMode, Is.EqualTo(10));
             Assert.That(properties.Type, Is.EqualTo("0"));
-            Assert.That(properties.Headers, Is.EqualTo(new Dictionary<string, object>()));
+            Assert.That(properties.Headers, Is.EqualTo(netqRabbitProperties.Headers));
             Assert.That(properties.ContentType, Is.EqualTo("1"));
             Assert.That(properties.ContentEncoding, Is.EqualTo("2"));
             Assert.That(properties.MessageId, Is.EqualTo("3"));
