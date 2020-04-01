@@ -5,7 +5,7 @@ using EesyNetQRpc = EasyNetQ.Producer.Rpc;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    internal class RpcRabbitWrapper : EesyNetQRpc
+    public class RpcRabbitWrapper : EesyNetQRpc
     {
         public RpcRabbitWrapper(RpcConfiguration configuration, ConnectionConfiguration connectionConfiguration, IAdvancedBus advancedBus, IEventBus eventBus, IConventions conventions, 
             IExchangeDeclareStrategy exchangeDeclareStrategy, IMessageDeliveryModeStrategy messageDeliveryModeStrategy, ITimeoutStrategy timeoutStrategy, 

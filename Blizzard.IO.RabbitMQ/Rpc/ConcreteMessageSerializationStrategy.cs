@@ -4,7 +4,7 @@ using ISerializer = Blizzard.IO.Core.Rpc.ISerializer;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    internal class ConcreteMessageSerializationStrategy : IMessageSerializationStrategy
+    public class ConcreteMessageSerializationStrategy : IMessageSerializationStrategy
     {
         private readonly ISerializer _serializer;
 
