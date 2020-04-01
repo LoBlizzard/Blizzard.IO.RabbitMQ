@@ -10,45 +10,45 @@ namespace Blizzard.IO.RabbitMQ
         IConverter<RabbitMessageProperties, MessageProperties>,
         IConverter<MessageProperties, RabbitMessageProperties>
     {
-        public MessageProperties Convert(RabbitMessageProperties obj)
+        public MessageProperties Convert(RabbitMessageProperties messageProperties)
         {
             return new MessageProperties
             {
-                DeliveryMode = obj.DeliveryMode,
-                Type = obj.Type,
-                Headers = obj.Headers as Dictionary<string, object>,
-                ContentType = obj.ContentType,
-                ContentEncoding = obj.ContentEncoding,
-                MessageId = obj.MessageId,
-                CorrelationId = obj.CorrelationId,
-                ReplyTo = obj.ReplyTo,
-                Timestamp = obj.Timestamp,
-                UserId = obj.UserId,
-                AppId = obj.AppId,
-                ClusterId = obj.ClusterId,
-                Expiration = obj.Expiration,
-                Priority = obj.Priority
+                DeliveryMode = messageProperties.DeliveryMode,
+                Type = messageProperties.Type,
+                Headers = messageProperties.Headers,
+                ContentType = messageProperties.ContentType,
+                ContentEncoding = messageProperties.ContentEncoding,
+                MessageId = messageProperties.MessageId,
+                CorrelationId = messageProperties.CorrelationId,
+                ReplyTo = messageProperties.ReplyTo,
+                Timestamp = messageProperties.Timestamp,
+                UserId = messageProperties.UserId,
+                AppId = messageProperties.AppId,
+                ClusterId = messageProperties.ClusterId,
+                Expiration = messageProperties.Expiration,
+                Priority = messageProperties.Priority
             };
         }
 
-        public RabbitMessageProperties Convert(MessageProperties obj)
+        public RabbitMessageProperties Convert(MessageProperties messageProperties)
         {
             return new RabbitMessageProperties
             {
-                DeliveryMode = obj.DeliveryMode,
-                Type = obj.Type,
-                Headers = obj.Headers as Dictionary<string, object>,
-                ContentType = obj.ContentType,
-                ContentEncoding = obj.ContentEncoding,
-                MessageId = obj.MessageId,
-                CorrelationId = obj.CorrelationId,
-                ReplyTo = obj.ReplyTo,
-                Timestamp = obj.Timestamp,
-                UserId = obj.UserId,
-                AppId = obj.AppId,
-                ClusterId = obj.ClusterId,
-                Expiration = obj.Expiration,
-                Priority = obj.Priority
+                DeliveryMode = messageProperties.DeliveryMode,
+                Type = messageProperties.Type,
+                Headers = messageProperties.Headers,
+                ContentType = messageProperties.ContentType,
+                ContentEncoding = messageProperties.ContentEncoding,
+                MessageId = messageProperties.MessageId,
+                CorrelationId = messageProperties.CorrelationId,
+                ReplyTo = messageProperties.ReplyTo,
+                Timestamp = messageProperties.Timestamp,
+                UserId = messageProperties.UserId,
+                AppId = messageProperties.AppId,
+                ClusterId = messageProperties.ClusterId,
+                Expiration = messageProperties.Expiration,
+                Priority = messageProperties.Priority
             };
         }
     }

@@ -8,7 +8,7 @@ namespace Blizzard.IO.RabbitMQ.Entities
     {
         public byte DeliveryMode { get; set; }
         public string Type { get; set; }
-        public Dictionary<string, object> Headers { get; set; }
+        public IDictionary<string, object> Headers { get; set; }
         public string ContentType { get; set; }
         public string ContentEncoding { get; set; }
         public string MessageId { get; set; }
