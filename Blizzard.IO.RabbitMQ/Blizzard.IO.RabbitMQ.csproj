@@ -11,5 +11,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Blizzard.IO.Core\Blizzard.IO.Core\Blizzard.IO.Core.csproj" />
   </ItemGroup>
-
 </Project>
