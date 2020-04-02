@@ -51,7 +51,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Publish_WithDataOnly_CallsExpectedMethods()
+        public void Publish_WithDataOnly_CallsSerializeAndPublishOnceAdvancedTwice()
         {
             // Act
             _netqRabbitPublisher.Publish(_defaultData);
@@ -64,7 +64,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRoutingKey_CallsExpectedMethods()
+        public void Publish_CalledWithDataAndRoutingKey_CallsSerializeAndPublishOnceAdvancedTwice()
         {
             // Arrange
             string routingKey = "notDefault";
@@ -80,7 +80,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRabbitMessageProperties_CallsExpectedMethods()
+        public void Publish_CalledWithDataAndRabbitMessageProperties_CallsSerializeAndPublishOnceAdvancedTwice()
         {
             // Act
             _netqRabbitPublisher.Publish(_defaultData, new RabbitMessageProperties());
@@ -93,7 +93,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRabbitMessagePropertiesAndRoutingKey_CallsExpectedMethods()
+        public void Publish_CalledWithDataAndRabbitMessagePropertiesAndRoutingKey_CallsSerializeAndPublishOnceAdvancedTwice()
         {
             // Arrange
             string routingKey = "notDefault";
