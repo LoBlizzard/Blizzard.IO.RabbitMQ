@@ -19,7 +19,7 @@ namespace Blizzard.IO.RabbitMQ
         {
             _netqBus = netqBus;
             _serializer = serializer;
-            _destinationExchange = _netqBus.Advanced.ExchangeDeclare(destinationExchange.Name.ToLower(),
+            _destinationExchange = _netqBus.Advanced.ExchangeDeclare(destinationExchange.Name,
                 destinationExchange.Type.ToString(), destinationExchange.Passive, destinationExchange.Durable,
                 destinationExchange.AutoDelete, destinationExchange.Internal, destinationExchange.AlternateExchange,
                 destinationExchange.Delayed);
