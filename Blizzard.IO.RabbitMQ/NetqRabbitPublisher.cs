@@ -42,7 +42,6 @@ namespace Blizzard.IO.RabbitMQ
             byte[] body = _serializer.Serialize(data);
             var netqMessageProperties = new MessageProperties();
             EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
-
             _netqBus.Advanced.Publish(_destinationExchange, routingKey, false, netqMessageProperties, body);
         }
 
