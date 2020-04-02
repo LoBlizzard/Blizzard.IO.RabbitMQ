@@ -11,7 +11,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
     {
         public IBus Bus { get; }
         public RpcMessageType RpcMessageType { get; }
-        public ILogger<NetqRabbitRpcConnection> _logger;
+        private readonly ILogger<NetqRabbitRpcConnection> _logger;
 
         public NetqRabbitRpcConnection(RpcConfiguration configuration, string hostname, string username, string password, ILoggerFactory loggerFactory, 
             int heartBeat = 10, int preFetch = 50, ushort timeout = 10,bool publisherConfirms = false, bool persistent = true, string product = null, 
@@ -47,7 +47,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             bool publisherConfirms, bool persistent, string product,string platform, string virtualHost)
         {
             string connectionString = $"host={hostname};username={username};password={password};requestedHeartbeat={heartBeat};prefetchcount={preFetch};" +
-                $"persistentMessages={persistent};publisherConfirms={publisherConfirms};timeout={timeout}";
+                $"persistentMessages={persistent};publisherConfirms={publisherConfirms};timeout={timeout};";
             if (product != null)
             {
                 connectionString += $"product={product}";

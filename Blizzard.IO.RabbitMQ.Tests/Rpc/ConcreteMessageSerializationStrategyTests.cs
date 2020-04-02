@@ -27,7 +27,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             //Arrange
             long data = 1000;
 
-            byte[] serializedData = new byte[]
+            var serializedData = new byte[]
             {
                 0,1,2,3,4,5
             };
@@ -52,7 +52,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             //Arrange
             long data = 1000;
 
-            byte[] serializedData = new byte[]
+            var serializedData = new byte[]
             {
                 0,1,2,3,4,5
             };
