@@ -13,6 +13,14 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             _serializer = serializer;
         }
 
+        /// <summary>
+        /// This method is for internal use of the library.
+        /// The user of the easynetq pipeline should expect to always receive <param type="Func<Type, object>"></param> when calling request or respond and to call 
+        /// this lambda with the right type in order to get the actual object
+        /// </summary>
+        /// <param name="properties"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
         public IMessage DeserializeMessage(MessageProperties properties, byte[] body)
         {
             return new Message<Func<Type, object>>(type => _serializer.Deserialize(body, type), properties);

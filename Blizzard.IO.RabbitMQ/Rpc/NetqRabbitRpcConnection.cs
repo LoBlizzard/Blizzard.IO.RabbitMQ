@@ -8,7 +8,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
 {
     public class NetqRabbitRpcConnection : INetqRpcRabbitConnection<Func<Type, object>>
     {
-        public IBus RabbitBus { get; }
+        public IBus Bus { get; }
         public RpcMessageType MessageType { get; }
 
         public NetqRabbitRpcConnection(RpcConfiguration configuration, string hostname, string username, string password, int heartBeat = 10, int preFetch = 50, ushort timeout = 10,
@@ -31,14 +31,14 @@ namespace Blizzard.IO.RabbitMQ.Rpc
                 connectionString += $"virtualHost={virtualHost}";
             }
 
-            RabbitBus = RabbitHutch.CreateBus(connectionString, registerer =>
+            Bus = RabbitHutch.CreateBus(connectionString, registerer =>
             {
                 switch (rpcMessageType)
                 {
                     case RpcMessageType.Abstract:
                         registerer.Register<IMessageSerializationStrategy, AbstractMessageSerializationStrategy>();
                         break;
-                    case RpcMessageType.Concrete:
+                    default:
                         registerer.Register<IMessageSerializationStrategy, ConcreteMessageSerializationStrategy>();
                         break;
                 }
