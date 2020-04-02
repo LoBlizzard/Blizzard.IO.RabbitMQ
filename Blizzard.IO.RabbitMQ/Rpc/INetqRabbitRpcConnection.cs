@@ -3,7 +3,7 @@ using EasyNetQ;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public interface INetqRpcRabbitConnection<TReturnType>
+    public interface INetqRabbitRpcConnection<TReturnType>
     {
         IBus Bus { get; }
         RpcMessageType RpcMessageType { get; }

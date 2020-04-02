@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public class NetqRabbitRpcConnection : INetqRpcRabbitConnection<Func<Type, object>>
+    public class NetqRabbitRpcConnection : INetqRabbitRpcConnection<Func<Type, object>>
     {
         public IBus Bus { get; }
         public RpcMessageType RpcMessageType { get; }
