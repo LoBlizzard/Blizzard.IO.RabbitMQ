@@ -35,7 +35,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             {
                 switch (rpcMessageType)
                 {
-                    case RpcMessageType.Abstarct:
+                    case RpcMessageType.Abstract:
                         registerer.Register<IMessageSerializationStrategy, AbstractMessageSerializationStrategy>();
                         break;
                     case RpcMessageType.Concrete:

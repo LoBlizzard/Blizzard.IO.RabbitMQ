@@ -2,7 +2,7 @@
 {
     public enum RpcMessageType
     {
-        Abstarct,
+        Abstract,
         Concrete
     }
 }
