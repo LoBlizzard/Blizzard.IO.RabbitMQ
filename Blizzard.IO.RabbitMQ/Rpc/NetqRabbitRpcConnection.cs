@@ -10,7 +10,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
     public class NetqRabbitRpcConnection : INetqRpcRabbitConnection<Func<Type, object>>
     {
         public IBus Bus { get; }
-        public RpcMessageType MessageType { get; }
+        public RpcMessageType RpcMessageType { get; }
         public ILogger<NetqRabbitRpcConnection> _logger;
 
         public NetqRabbitRpcConnection(RpcConfiguration configuration, string hostname, string username, string password, ILoggerFactory loggerFactory, 
@@ -18,7 +18,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             string platform = null, string virtualHost = null,ISerializer serializer = null, RpcMessageType rpcMessageType = RpcMessageType.Concrete)
         {
             _logger = loggerFactory.CreateLogger<NetqRabbitRpcConnection>();
-            MessageType = rpcMessageType;
+            RpcMessageType = rpcMessageType;
 
             string connectionString = GetConnectionString(hostname, username, password, heartBeat, preFetch, timeout, publisherConfirms, persistent,
                 product, platform, virtualHost);

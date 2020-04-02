@@ -6,6 +6,6 @@ namespace Blizzard.IO.RabbitMQ.Rpc
     public interface INetqRpcRabbitConnection<TReturnType>
     {
         IBus Bus { get; }
-        RpcMessageType MessageType { get; }
+        RpcMessageType RpcMessageType { get; }
     }
 }
