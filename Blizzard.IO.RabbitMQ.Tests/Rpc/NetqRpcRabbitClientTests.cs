@@ -1,5 +1,4 @@
-﻿using Blizzard.IO.Core.Rpc;
-using Blizzard.IO.RabbitMQ.Entities.Rpc;
+﻿using Blizzard.IO.RabbitMQ.Entities.Rpc;
 using Blizzard.IO.RabbitMQ.Rpc;
 using EasyNetQ;
 using Microsoft.Extensions.Logging;
@@ -84,7 +83,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
 
             //Act
-            var actualRespond = _rpcClient.RequestASync<RequestStub, RespondStub>(request).Result;
+            var actualRespond = _rpcClient.RequestAsync<RequestStub, RespondStub>(request).Result;
 
             //Assert
             Assert.AreEqual(expectedRespond, actualRespond);
@@ -101,11 +100,33 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Concrete);
 
             //Act
-            var actualRespond = _rpcClient.RequestASync<RequestStub, RespondStub>(request).Result;
+            var actualRespond = _rpcClient.RequestAsync<RequestStub, RespondStub>(request).Result;
 
             //Assert
             Assert.AreEqual(expectedRespond, actualRespond);
             _busMock.Verify(bus => bus.RequestAsync<RequestStub, Func<Type, object>>(request), Times.Once);
+        }
+
+        [Test]
+        public void Request_OnNonValidRpcMessageTypeInNetqRpcRabbitConnection_ShouldThrowInvalidOperationException()
+        {
+            //Arrange
+            RequestStub request = new RequestStub();
+            _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns((RpcMessageType)10);
+
+            //Act
+            Assert.Throws<InvalidOperationException>(()=>_rpcClient.Request<RequestStub, RespondStub>(request));
+        }
+
+        [Test]
+        public void RequestAsync_OnNonValidRpcMessageTypeInNetqRpcRabbitConnection_ShouldThrowAggregateException()
+        {
+            //Arrange
+            RequestStub request = new RequestStub();
+            _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns((RpcMessageType)10);
+
+            //Act
+            Assert.Throws<AggregateException>(() => _rpcClient.RequestAsync<RequestStub, RespondStub>(request).Wait());
         }
     }
 }

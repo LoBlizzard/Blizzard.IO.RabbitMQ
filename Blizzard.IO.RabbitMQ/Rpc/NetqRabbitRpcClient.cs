@@ -37,7 +37,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
                 $"rpc type: {_netqRpcRabbitConnection.RpcMessageType}");
         }
 
-        public async Task<TRespond> RequestASync<TRequest, TRespond>(TRequest request)
+        public async Task<TRespond> RequestAsync<TRequest, TRespond>(TRequest request)
         where TRequest : class
         where TRespond : class
         {
