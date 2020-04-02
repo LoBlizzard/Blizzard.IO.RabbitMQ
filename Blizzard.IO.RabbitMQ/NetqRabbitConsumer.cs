@@ -13,7 +13,7 @@ namespace Blizzard.IO.RabbitMQ
         private readonly IDeserializer<TData> _deserializer;
         private readonly IConcreteTypeDeserializer<TData> _concreteTypeDeserializer;
         private readonly IQueue _sourceQueue;
-        private readonly IConverter<MessageProperties, RabbitMessageProperties> _coverter;
+        private readonly IConverter<MessageProperties, RabbitMessageProperties> _converter;
         private readonly ILogger<NetqRabbitConsumer<TData>> _logger;
         
         private IDisposable _consumeTask;
@@ -28,7 +28,7 @@ namespace Blizzard.IO.RabbitMQ
             _netqBus = netqBus;
             _sourceQueue = sourceQueue;
             _logger = loggerFactory.CreateLogger<NetqRabbitConsumer<TData>>();
-            _coverter = coverter ?? new RabbitPropertiesConverter();
+            _converter = coverter ?? new RabbitPropertiesConverter();
         }
 
         public NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue, IDeserializer<TData> deserializer, 
@@ -61,7 +61,7 @@ namespace Blizzard.IO.RabbitMQ
             MessageReceivedInfo messageInfo)
         {
             TData data = _deserializer.Deserialize(messageBytes);
-            RabbitMessageProperties properties = _coverter.Convert(messageProperties);
+            RabbitMessageProperties properties = _converter.Convert(messageProperties);
             MessageReceived?.Invoke(data);
             MessageWithMetadataReceived?.Invoke(data, properties);
         }
@@ -71,7 +71,7 @@ namespace Blizzard.IO.RabbitMQ
         {
             Type messageConcreteType = messageProperties.Type.GetType();
             TData data = _concreteTypeDeserializer.Deserialize(messageBytes, messageConcreteType);
-            RabbitMessageProperties properties = _coverter.Convert(messageProperties);
+            RabbitMessageProperties properties = _converter.Convert(messageProperties);
             MessageReceived?.Invoke(data);
             MessageWithMetadataReceived?.Invoke(data, properties);
         }
