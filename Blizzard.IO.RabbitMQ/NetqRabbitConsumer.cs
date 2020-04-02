@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Blizzard.IO.Core;
 using Blizzard.IO.RabbitMQ.Entities;
 using EasyNetQ;
 using EasyNetQ.Topology;
+using Microsoft.Extensions.Logging;
 
 namespace Blizzard.IO.RabbitMQ.Implementaions
 {
@@ -13,29 +13,38 @@ namespace Blizzard.IO.RabbitMQ.Implementaions
         private readonly IDeserializer<TData> _deserializer;
         private readonly IConcreteTypeDeserializer<TData> _concreteTypeDeserializer;
         private readonly IQueue _sourceQueue;
-
+        private readonly IConverter<MessageProperties, RabbitMessageProperties> _coverter;
+        private readonly ILogger<NetqRabbitConsumer<TData>> _logger;
+        private IDisposable _consumeTask;
+        
         public event Action<TData> MessageReceived;
         public event Action<TData, RabbitMessageProperties> MessageWithMetadataReceived;
 
-        public NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue,
-            IDeserializer<TData> deserializer)
+        protected NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue, ILoggerFactory loggerFactory,
+            IConverter<MessageProperties, RabbitMessageProperties> coverter)
         {
-            _netqBus = netqBus ?? throw new ArgumentNullException(nameof(netqBus));
-            _sourceQueue = sourceQueue ?? throw new ArgumentNullException(nameof(sourceQueue));
-            _deserializer = deserializer ?? throw new ArgumentNullException(nameof(deserializer));
+            _netqBus = netqBus;
+            _sourceQueue = sourceQueue;
+            _coverter = coverter ?? new RabbitPropertiesConverter();
         }
 
-        public NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue,
-            IConcreteTypeDeserializer<TData> concreteTypeDeserializer)
+        public NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue, IDeserializer<TData> deserializer, 
+            ILoggerFactory loggerFactory, IConverter<MessageProperties, RabbitMessageProperties> coverter = null)
+            : this(netqBus, sourceQueue, loggerFactory, coverter)
         {
-            _netqBus = netqBus ?? throw new ArgumentNullException(nameof(netqBus));
-            _sourceQueue = sourceQueue ?? throw new ArgumentNullException(nameof(sourceQueue));
-            _concreteTypeDeserializer = concreteTypeDeserializer ?? throw new ArgumentNullException(nameof(concreteTypeDeserializer));
+            _deserializer = deserializer;
+        }
+
+        public NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue, IConcreteTypeDeserializer<TData> concreteTypeDeserializer,
+            ILoggerFactory loggerFactory, IConverter<MessageProperties, RabbitMessageProperties> coverter = null)
+            : this(netqBus, sourceQueue, loggerFactory, coverter)
+        {
+            _concreteTypeDeserializer = concreteTypeDeserializer;
         }
 
         public void Start()
         {
-            _netqBus.Advanced.Consume(_sourceQueue, (messageBytes, messageProperties, messageInfo) =>
+            _consumeTask = _netqBus.Advanced.Consume(_sourceQueue, (messageBytes, messageProperties, messageInfo) =>
             {
                 TData data;
                 if (_concreteTypeDeserializer != null)
@@ -47,37 +56,20 @@ namespace Blizzard.IO.RabbitMQ.Implementaions
                 {
                     data = _deserializer.Deserialize(messageBytes);
                 }
-                RabbitMessageProperties properties = ConvertMassageProperties(messageProperties);
 
+                RabbitMessageProperties properties = _coverter.Convert(messageProperties);
                 MessageReceived?.Invoke(data);
                 MessageWithMetadataReceived?.Invoke(data, properties);
-            });
-        }
-
-        private RabbitMessageProperties ConvertMassageProperties(MessageProperties messageProperties)
-        {
-            return new RabbitMessageProperties
-            {
-                DeliveryMode = messageProperties.DeliveryMode,
-                Type = messageProperties.Type,
-                Headers = messageProperties.Headers as Dictionary<string, object>,
-                ContentType = messageProperties.ContentType,
-                ContentEncoding = messageProperties.ContentEncoding,
-                MessageId = messageProperties.MessageId,
-                CorellationId = messageProperties.CorrelationId,
-                ReplyTo = messageProperties.ReplyTo,
-                Timestamp = DateTime.FromBinary(messageProperties.Timestamp),
-                UserId = messageProperties.UserId,
-                AddId = messageProperties.AppId,
-                ClusterId = messageProperties.ClusterId,
-                Expiration = messageProperties.Expiration,
-                Priority = messageProperties.Priority
-            };
+            });       
         }
 
         public void Stop()
         {
-            _netqBus.Dispose();
+            if (_consumeTask == null)
+            {
+
+            }
+            _consumeTask.Dispose();
         }
     }
 }
