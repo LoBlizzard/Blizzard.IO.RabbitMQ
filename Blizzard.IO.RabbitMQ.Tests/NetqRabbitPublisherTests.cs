@@ -34,8 +34,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _defaultDestinationExchange = new RabbitExchange()
             {
                 Name = "test",
-                Type = RabbitExchangeType.Fanout,
-                AlternateExchange = "test",
+                Type = RabbitExchangeType.Fanout
             };
             _defaultRoutingKey = "test";
             _defaultData = "data";
@@ -43,7 +42,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
 
             _serializerMock.Setup(serializer => serializer.Serialize(It.IsAny<string>())).Returns(_defaultSerializedData);
             _busMock.Setup(bus => bus.Advanced).Returns(_advancedBusMock.Object);
-            _advancedBusMock.Setup(advancedBus => advancedBus.ExchangeDeclare(_defaultDestinationExchange.Name, _defaultDestinationExchange.Type.ToString(),
+            _advancedBusMock.Setup(advancedBus => advancedBus.ExchangeDeclare(_defaultDestinationExchange.Name, Utilities.ExchangeTypeToStringResolver[_defaultDestinationExchange.Type],
                 _defaultDestinationExchange.Passive, _defaultDestinationExchange.Durable, _defaultDestinationExchange.AutoDelete,
                 _defaultDestinationExchange.Internal, _defaultDestinationExchange.AlternateExchange, _defaultDestinationExchange.Delayed)).Returns(_exchangeMock.Object);
 
