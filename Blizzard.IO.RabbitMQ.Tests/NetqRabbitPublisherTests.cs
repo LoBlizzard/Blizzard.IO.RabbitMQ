@@ -1,4 +1,4 @@
-using Blizzard.IO.RabbitMQ.Entities;
+﻿using Blizzard.IO.RabbitMQ.Entities;
 using EasyNetQ;
 using EasyNetQ.Topology;
 using Microsoft.Extensions.Logging;
@@ -61,7 +61,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _serializerMock.Verify(serializer => serializer.Serialize(_defaultData), Times.Once);
             _busMock.Verify(bus => bus.Advanced, Times.Once);
             _advancedBusMock.Verify(advancedBus => advancedBus.Publish(It.IsAny<Exchange>(), _defaultRoutingKey,
-                _defaultIsAbstract, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
+                false, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _serializerMock.Verify(serializer => serializer.Serialize(_defaultData), Times.Once);
             _busMock.Verify(bus => bus.Advanced, Times.Once);
             _advancedBusMock.Verify(advancedBus => advancedBus.Publish(It.IsAny<Exchange>(), routingKey,
-                _defaultIsAbstract, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
+                false, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _serializerMock.Verify(serializer => serializer.Serialize(_defaultData), Times.Once);
             _busMock.Verify(bus => bus.Advanced, Times.Once);
             _advancedBusMock.Verify(advancedBus => advancedBus.Publish(It.IsAny<Exchange>(), _defaultRoutingKey,
-                _defaultIsAbstract, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
+                false, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
         }
 
         [Test]
@@ -106,7 +106,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _serializerMock.Verify(serializer => serializer.Serialize(_defaultData), Times.Once);
             _busMock.Verify(bus => bus.Advanced, Times.Once);
             _advancedBusMock.Verify(advancedBus => advancedBus.Publish(It.IsAny<Exchange>(), routingKey,
-                _defaultIsAbstract, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
+                false, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
         }
     }
 }
