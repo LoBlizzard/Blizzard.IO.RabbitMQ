@@ -35,11 +35,10 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         public void Respond_OnValidCallbackAndConcreteRpcType_ShouldStartRespond()
         {
             //Arrange
-            Func<RequestStub, RespondStub> callback = request => new RespondStub();
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Concrete);
 
             //Act
-            _server.Respond<RequestStub, RespondStub>(callback);
+            _server.Respond<RequestStub, RespondStub>(Callback);
 
             //Assert
             _busMock.Verify(bus => bus.Respond<Func<Type, object>, RespondStub>(It.IsAny<Func<Func<Type, object>, RespondStub>>()), Times.Once);
@@ -49,11 +48,10 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         public void Respond_OnValidCallbackAndAbstractRpcType_ShouldStartRespond()
         {
             //Arrange
-            Func<RequestStub, RespondStub> callback = request => new RespondStub();
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
 
             //Act
-            _server.Respond<RequestStub, RespondStub>(callback);
+            _server.Respond<RequestStub, RespondStub>(Callback);
 
             //Assert
             _busMock.Verify(bus => bus.Respond<RequestStub, RespondStub>(It.IsAny<Func<RequestStub, RespondStub>>()), Times.Once);
@@ -63,26 +61,24 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         public void Respond_OnInValidRpcType_ShouldThrowInvalidOperationException()
         {
             //Arrange
-            Func<RequestStub, RespondStub> callback = request => new RespondStub();
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns((RpcMessageType)10);
 
             //Act & Assert
-            Assert.Throws<InvalidOperationException>(() => _server.Respond<RequestStub, RespondStub>(callback));
+            Assert.Throws<InvalidOperationException>(() => _server.Respond<RequestStub, RespondStub>(Callback));
         }
 
         [Test]
         public void Respond_OnRespondCalledMoreThanOneTime_ShouldThrowInvalidOperationException()
         {
             //Arrange
-            Func<RequestStub, RespondStub> callback = request => new RespondStub();
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
 
             Mock<IDisposable> handlerMock = new Mock<IDisposable>();
             _busMock.Setup(bus => bus.Respond<RequestStub, RespondStub>(It.IsAny<Func<RequestStub, RespondStub>>())).Returns(handlerMock.Object);
-            _server.Respond(callback);
+            _server.Respond<RequestStub, RespondStub>(Callback);
 
             //Act & Assert
-            Assert.Throws<InvalidOperationException>(() => _server.Respond<RequestStub, RespondStub>(callback));
+            Assert.Throws<InvalidOperationException>(() => _server.Respond<RequestStub, RespondStub>(Callback));
         }
 
         [Test]
@@ -93,7 +89,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Concrete);
 
             //Act
-            _server.RespondAsync<RequestStub, RespondStub>(callback);
+            _server.RespondAsync<RequestStub, RespondStub>(AsyncCallback);
 
             //Assert
             _busMock.Verify(bus => bus.RespondAsync<Func<Type, object>, RespondStub>(It.IsAny<Func<Func<Type, object>, Task<RespondStub>>>()), Times.Once);
@@ -107,7 +103,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
 
             //Act
-            _server.RespondAsync<RequestStub, RespondStub>(callback);
+            _server.RespondAsync<RequestStub, RespondStub>(AsyncCallback);
 
             //Assert
             _busMock.Verify(bus => bus.RespondAsync<RequestStub, RespondStub>(It.IsAny<Func<RequestStub, Task<RespondStub>>>()), Times.Once);
@@ -117,26 +113,23 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         public void RespondAsync_OnInValidRpcType_ShouldThrowInvalidOperationException()
         {
             //Arrange
-            Func<RequestStub, Task<RespondStub>> callback = request => Task.Factory.StartNew(() => new RespondStub());
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns((RpcMessageType)10);
 
             //Act & Assert
-            Assert.Throws<InvalidOperationException>(() => _server.RespondAsync<RequestStub, RespondStub>(callback));
+            Assert.Throws<InvalidOperationException>(() => _server.RespondAsync<RequestStub, RespondStub>(AsyncCallback));
         }
 
         [Test]
         public void RespondAsync_OnRespondCalledMoreThanOneTime_ShouldThrowInvalidOperationException()
         {
             //Arrange
-            Func<RequestStub, Task<RespondStub>> callback = request => Task.Factory.StartNew(() => new RespondStub());
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
-
             Mock<IDisposable> handlerMock = new Mock<IDisposable>();
             _busMock.Setup(bus => bus.RespondAsync<RequestStub, RespondStub>(It.IsAny<Func<RequestStub, Task<RespondStub>>>())).Returns(handlerMock.Object);
-            _server.RespondAsync(callback);
+            _server.RespondAsync<RequestStub, RespondStub>(AsyncCallback);
 
             //Act & Assert
-            Assert.Throws<InvalidOperationException>(() => _server.RespondAsync<RequestStub, RespondStub>(callback));
+            Assert.Throws<InvalidOperationException>(() => _server.RespondAsync<RequestStub, RespondStub>(AsyncCallback));
         }
 
         [Test]
@@ -144,10 +137,9 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         {
             //Arrange
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
-            Func<RequestStub, RespondStub> callback = request => new RespondStub();
             Mock<IDisposable> handlerMock = new Mock<IDisposable>();
             _busMock.Setup(bus => bus.Respond<RequestStub, RespondStub>(It.IsAny<Func<RequestStub, RespondStub>>())).Returns(handlerMock.Object);
-            _server.Respond(callback);
+            _server.Respond<RequestStub, RespondStub>(Callback);
 
             //Act
             _server.Stop();
@@ -162,10 +154,9 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         {
             //Arrange
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
-            Func<RequestStub, Task<RespondStub>> callback = request => Task.Factory.StartNew(() => new RespondStub());
             Mock<IDisposable> handlerMock = new Mock<IDisposable>();
             _busMock.Setup(bus => bus.RespondAsync<RequestStub, RespondStub>(It.IsAny<Func<RequestStub, Task<RespondStub>>>())).Returns(handlerMock.Object);
-            _server.RespondAsync(callback);
+            _server.RespondAsync<RequestStub, RespondStub>(AsyncCallback);
 
             //Act
             _server.Stop();
@@ -179,7 +170,6 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         {
             //Arrange
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
-            Func<RequestStub, Task<RespondStub>> callback = request => Task.Factory.StartNew(() => new RespondStub());
             Mock<IDisposable> handlerMock = new Mock<IDisposable>();
             _busMock.Setup(bus => bus.RespondAsync<RequestStub, RespondStub>(It.IsAny<Func<RequestStub, Task<RespondStub>>>())).Returns(handlerMock.Object);
             _busMock.Setup(bus => bus.Respond<RequestStub, RespondStub>(It.IsAny<Func<RequestStub, RespondStub>>())).Returns(handlerMock.Object);
@@ -190,5 +180,9 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             //Assert
             handlerMock.Verify(handler => handler.Dispose(), Times.Never);
         }
+
+        private RespondStub Callback(RequestStub request) => new RespondStub();
+
+        private Task<RespondStub> AsyncCallback(RequestStub request) => Task.Factory.StartNew(() => new RespondStub());
     }
 }
