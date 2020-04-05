@@ -15,7 +15,7 @@ namespace Blizzard.IO.RabbitMQ
         public NetqRabbitConfigurator(IBus netqBus, ILoggerFactory loggerFactory)
         {
             _netqBus = netqBus;
-            _logger = loggerFactory.CreateLogger(typeof(NetqRabbitConfigurator));
+            _logger = loggerFactory.CreateLogger(nameof(NetqRabbitConfigurator));
         }
 
         public void Configure(RabbitConfiguration configuration)
