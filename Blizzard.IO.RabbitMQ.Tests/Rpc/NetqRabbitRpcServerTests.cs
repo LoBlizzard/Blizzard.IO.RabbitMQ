@@ -21,9 +21,10 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
 
     public class NetqRabbitRpcServerTests
     {
-        private NetqRabbitRpcServer _server;
         private Mock<INetqRpcRabbitConnection<Func<Type, object>>> _netqRpcRabbitConnectionMock;
         private Mock<IBus> _busMock;
+        
+        private NetqRabbitRpcServer _server;
 
         [SetUp]
         public void Setup()
