@@ -6,19 +6,10 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using Blizzard.IO.RabbitMQ.Tests.Stubs;
 
 namespace Blizzard.IO.RabbitMQ.Tests.Rpc
 {
-    class RequestStub
-    {
-        public int Value { get; set; }
-    }
-
-    class RespondStub
-    {
-        public int Value { get; set; }
-    }
-
     public class NetqRabbitRpcServerTests
     {
         private Mock<INetqRpcRabbitConnection<Func<Type, object>>> _netqRpcRabbitConnectionMock;
