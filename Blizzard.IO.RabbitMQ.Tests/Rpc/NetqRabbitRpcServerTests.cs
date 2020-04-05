@@ -24,6 +24,8 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             _netqRpcRabbitConnectionMock = new Mock<INetqRpcRabbitConnection<Func<Type, object>>>();
 
             _netqRpcRabbitConnectionMock.Setup(connection => connection.Bus).Returns(_busMock.Object);
+
+            //Setting up the logger
             Mock<ILogger> loggerMock = new Mock<ILogger>();
             Mock<ILoggerFactory> lfMock = new Mock<ILoggerFactory>();
             lfMock.Setup(lf => lf.CreateLogger(It.IsAny<string>())).Returns(loggerMock.Object);
@@ -166,7 +168,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void Stop_OnCallingCallingRespondAsyncOrRespond_ShouldNotDisposeTheHandler()
+        public void Stop_OnCallingRespondAsyncOrRespond_ShouldNotDisposeTheHandler()
         {
             //Arrange
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Abstract);
