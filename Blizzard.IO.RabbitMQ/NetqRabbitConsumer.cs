@@ -14,7 +14,7 @@ namespace Blizzard.IO.RabbitMQ
         private readonly IAbstractTypeDeserializer<TData> _concreteTypeDeserializer;
         private readonly IQueue _netqQueue;
         private readonly IConverter<MessageProperties, RabbitMessageProperties> _converter;
-        private readonly ILogger<NetqRabbitConsumer<TData>> _logger;
+        private readonly ILogger _logger;
         
         private IDisposable _consumeHandler;
         private readonly Func<byte[], MessageProperties, TData> _dataExtractionStrategy;
@@ -27,7 +27,7 @@ namespace Blizzard.IO.RabbitMQ
         {
             _netqBus = netqBus;
             _netqQueue = new Queue(sourceQueue.Name, sourceQueue.Exclusive);
-            _logger = loggerFactory.CreateLogger<NetqRabbitConsumer<TData>>();
+            _logger = loggerFactory.CreateLogger(typeof(NetqRabbitConsumer<TData>));
             _converter = coverter ?? new RabbitPropertiesConverter();
         }
 

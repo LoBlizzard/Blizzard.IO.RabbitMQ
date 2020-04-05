@@ -15,9 +15,10 @@ namespace Blizzard.IO.RabbitMQ.Tests
         private Mock<IBus> _netqBusMock;
         private Mock<IAdvancedBus> _netqAdvancedBusMock;
         private Mock<IDeserializer<int>> _deserializerMock;
-        private Mock<IAbstractTypeDeserializer<int>> _abstractTypeDeserializerMock;
         private Mock<IConverter<MessageProperties, RabbitMessageProperties>> _converterMock;
-        private ILoggerFactory _loggerFactory;
+        private Mock<ILoggerFactory> _loggerFactoryMock;
+        private Mock<ILogger> _loggerMock;
+        
         private RabbitQueue _sourceQueue;
 
         private NetqRabbitConsumer<int> _netqRabbitConsumer;
@@ -28,15 +29,17 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _netqBusMock = new Mock<IBus>();
             _netqAdvancedBusMock = new Mock<IAdvancedBus>();
             _deserializerMock = new Mock<IDeserializer<int>>();
-            _abstractTypeDeserializerMock = new Mock<IAbstractTypeDeserializer<int>>();
-            _sourceQueue = new RabbitQueue { Name = "EXAMPLE", Exclusive = false};
             _converterMock = new Mock<IConverter<MessageProperties, RabbitMessageProperties>>();
-            _loggerFactory = new LoggerFactory();
+            _loggerFactoryMock = new Mock<ILoggerFactory>();
+            _loggerMock = new Mock<ILogger>();
 
+            _sourceQueue = new RabbitQueue { Name = "EXAMPLE", Exclusive = false};
+
+            _loggerFactoryMock.Setup(factory => factory.CreateLogger(It.IsAny<string>())).Returns(_loggerMock.Object);
             _netqBusMock.SetupGet(bus => bus.Advanced).Returns(_netqAdvancedBusMock.Object);
 
             _netqRabbitConsumer = new NetqRabbitConsumer<int>(_netqBusMock.Object, _sourceQueue,
-                _deserializerMock.Object, _loggerFactory, _converterMock.Object);
+                _deserializerMock.Object, _loggerFactoryMock.Object, _converterMock.Object);
         }
 
         [Test]
