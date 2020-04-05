@@ -3,6 +3,7 @@ using Blizzard.IO.RabbitMQ.Entities;
 using Blizzard.IO.Core;
 using EasyNetQ;
 using EasyNetQ.Topology;
+using Microsoft.Extensions.Logging;
 
 namespace Blizzard.IO.RabbitMQ
 {
@@ -14,19 +15,20 @@ namespace Blizzard.IO.RabbitMQ
         private readonly IConverter<RabbitMessageProperties, MessageProperties> _rabbitMessagePropertiesToMessagePropertiesConverter;
         private readonly string _routingKey;
         private readonly bool _isAbstract;
+        private readonly ILogger _logger;
 
-        public NetqRabbitPublisher(IBus netqBus, ISerializer<TData> serializer, RabbitExchange destinationExchange, bool isAbstract = false, string routingKey = "/")
+        public NetqRabbitPublisher(IBus netqBus, ISerializer<TData> serializer,
+            RabbitExchange destinationExchange, ILoggerFactory loggerFactory, bool isAbstract = false, string routingKey = "/")
         {
             _netqBus = netqBus;
             _serializer = serializer;
-            _destinationExchange = _netqBus.Advanced.ExchangeDeclare(destinationExchange.Name,
-                Utilities.ExchangeTypeToStringResolver[destinationExchange.Type], destinationExchange.Passive, destinationExchange.Durable,
-                destinationExchange.AutoDelete, destinationExchange.Internal, destinationExchange.AlternateExchange,
-                destinationExchange.Delayed);
+            _destinationExchange = new Exchange(destinationExchange.Name);
 
             _isAbstract = isAbstract;
             _routingKey = routingKey;
             _rabbitMessagePropertiesToMessagePropertiesConverter = new RabbitPropertiesConverter();
+
+            _logger = loggerFactory.CreateLogger(nameof(NetqRabbitPublisher<TData>));
         }
 
         public void Publish(TData data)
@@ -35,6 +37,7 @@ namespace Blizzard.IO.RabbitMQ
             MessageProperties netqMessageProperties = new MessageProperties();
             EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
             _netqBus.Advanced.Publish(_destinationExchange, _routingKey, false, netqMessageProperties, body);
+            _logger.LogInformation($"Published Message. Exchange: {_destinationExchange.Name} RoutingKey: {_routingKey} .");
         }
 
         public void Publish(TData data, string routingKey)
@@ -43,6 +46,7 @@ namespace Blizzard.IO.RabbitMQ
             var netqMessageProperties = new MessageProperties();
             EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
             _netqBus.Advanced.Publish(_destinationExchange, routingKey, false, netqMessageProperties, body);
+            _logger.LogInformation($"Published Message. Exchange: {_destinationExchange.Name} RoutingKey: {routingKey} .");
         }
 
         public void Publish(TData data, RabbitMessageProperties rabbitMessageProperties)
@@ -51,6 +55,7 @@ namespace Blizzard.IO.RabbitMQ
             MessageProperties netqMessageProperties = _rabbitMessagePropertiesToMessagePropertiesConverter.Convert(rabbitMessageProperties);
             EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
             _netqBus.Advanced.Publish(_destinationExchange, _routingKey, false, netqMessageProperties, body);
+            _logger.LogInformation($"Published Message. Exchange: {_destinationExchange.Name} RoutingKey: {_routingKey} .");
         }
 
         public void Publish(TData data, RabbitMessageProperties rabbitMessageProperties, string routingKey)
@@ -59,6 +64,7 @@ namespace Blizzard.IO.RabbitMQ
             MessageProperties netqMessageProperties = _rabbitMessagePropertiesToMessagePropertiesConverter.Convert(rabbitMessageProperties);
             EnrichWithTypeIfAbstract(netqMessageProperties, data.GetType());
             _netqBus.Advanced.Publish(_destinationExchange, routingKey, false, netqMessageProperties, body);
+            _logger.LogInformation($"Published Message. Exchange: {_destinationExchange.Name} RoutingKey: {routingKey} .");
         }
 
         private void EnrichWithTypeIfAbstract(MessageProperties messageProperties, Type dataType)

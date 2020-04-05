@@ -1,6 +1,7 @@
 ﻿using Blizzard.IO.RabbitMQ.Entities;
 using EasyNetQ;
 using EasyNetQ.Topology;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using ISerializer = Blizzard.IO.Core.ISerializer<string>;
@@ -13,7 +14,8 @@ namespace Blizzard.IO.RabbitMQ.Tests
         private Mock<IBus> _busMock;
         private Mock<ISerializer> _serializerMock;
         private Mock<IAdvancedBus> _advancedBusMock;
-        private Mock<IExchange> _exchangeMock;
+        private Mock<ILoggerFactory> _loggerFactoryMock;
+        private Mock<ILogger> _loggerMock;
 
         private RabbitExchange _defaultDestinationExchange;
         private byte[] _defaultSerializedData;
@@ -29,13 +31,13 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _busMock = new Mock<IBus>();
             _serializerMock = new Mock<Core.ISerializer<string>>();
             _advancedBusMock = new Mock<IAdvancedBus>();
-            _exchangeMock = new Mock<IExchange>();
+            _loggerFactoryMock = new Mock<ILoggerFactory>();
+            _loggerMock = new Mock<ILogger>();
 
             _defaultSerializedData = new byte[0];
             _defaultDestinationExchange = new RabbitExchange()
             {
-                Name = "test",
-                Type = RabbitExchangeType.Fanout
+                Name = "test"
             };
             _defaultRoutingKey = "test";
             _defaultData = "data";
@@ -43,28 +45,27 @@ namespace Blizzard.IO.RabbitMQ.Tests
 
             _serializerMock.Setup(serializer => serializer.Serialize(It.IsAny<string>())).Returns(_defaultSerializedData);
             _busMock.Setup(bus => bus.Advanced).Returns(_advancedBusMock.Object);
-            _advancedBusMock.Setup(advancedBus => advancedBus.ExchangeDeclare(_defaultDestinationExchange.Name, Utilities.ExchangeTypeToStringResolver[_defaultDestinationExchange.Type],
-                _defaultDestinationExchange.Passive, _defaultDestinationExchange.Durable, _defaultDestinationExchange.AutoDelete,
-                _defaultDestinationExchange.Internal, _defaultDestinationExchange.AlternateExchange, _defaultDestinationExchange.Delayed)).Returns(_exchangeMock.Object);
+            _loggerFactoryMock.Setup(loggerFactory => loggerFactory.CreateLogger(It.IsAny<string>()))
+                .Returns(_loggerMock.Object);
 
-            _netqRabbitPublisher = new NetqRabbitPublisher<string>(_busMock.Object, _serializerMock.Object, _defaultDestinationExchange, _defaultIsAbstract, _defaultRoutingKey);
+            _netqRabbitPublisher = new NetqRabbitPublisher<string>(_busMock.Object, _serializerMock.Object, _defaultDestinationExchange, _loggerFactoryMock.Object, _defaultIsAbstract, _defaultRoutingKey);
         }
 
         [Test]
-        public void Publish_WithDataOnly_CallsSerializeAndPublishOnceAdvancedTwice()
+        public void Publish_WithDataOnly_CallsSerializeAdvanceAndPublishOnce()
         {
             // Act
             _netqRabbitPublisher.Publish(_defaultData);
 
             // Assert
             _serializerMock.Verify(serializer => serializer.Serialize(_defaultData), Times.Once);
-            _busMock.Verify(bus => bus.Advanced, Times.Exactly(2));
-            _advancedBusMock.Verify(advancedBus => advancedBus.Publish(_exchangeMock.Object, _defaultRoutingKey,
+            _busMock.Verify(bus => bus.Advanced, Times.Once);
+            _advancedBusMock.Verify(advancedBus => advancedBus.Publish(It.IsAny<Exchange>(), _defaultRoutingKey,
                 _defaultIsAbstract, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRoutingKey_CallsSerializeAndPublishOnceAdvancedTwice()
+        public void Publish_CalledWithDataAndRoutingKey_CallsSerializeAdvanceAndPublishOnce()
         {
             // Arrange
             string routingKey = "notDefault";
@@ -74,26 +75,26 @@ namespace Blizzard.IO.RabbitMQ.Tests
 
             // Assert
             _serializerMock.Verify(serializer => serializer.Serialize(_defaultData), Times.Once);
-            _busMock.Verify(bus => bus.Advanced, Times.Exactly(2));
-            _advancedBusMock.Verify(advancedBus => advancedBus.Publish(_exchangeMock.Object, routingKey,
+            _busMock.Verify(bus => bus.Advanced, Times.Once);
+            _advancedBusMock.Verify(advancedBus => advancedBus.Publish(It.IsAny<Exchange>(), routingKey,
                 _defaultIsAbstract, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRabbitMessageProperties_CallsSerializeAndPublishOnceAdvancedTwice()
+        public void Publish_CalledWithDataAndRabbitMessageProperties_CallsSerializeAdvanceAndPublishOnce()
         {
             // Act
             _netqRabbitPublisher.Publish(_defaultData, new RabbitMessageProperties());
 
             // Assert
             _serializerMock.Verify(serializer => serializer.Serialize(_defaultData), Times.Once);
-            _busMock.Verify(bus => bus.Advanced, Times.Exactly(2));
-            _advancedBusMock.Verify(advancedBus => advancedBus.Publish(_exchangeMock.Object, _defaultRoutingKey,
+            _busMock.Verify(bus => bus.Advanced, Times.Once);
+            _advancedBusMock.Verify(advancedBus => advancedBus.Publish(It.IsAny<Exchange>(), _defaultRoutingKey,
                 _defaultIsAbstract, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRabbitMessagePropertiesAndRoutingKey_CallsSerializeAndPublishOnceAdvancedTwice()
+        public void Publish_CalledWithDataAndRabbitMessagePropertiesAndRoutingKey_CallsSerializeAdvanceAndPublishOnce()
         {
             // Arrange
             string routingKey = "notDefault";
@@ -103,8 +104,8 @@ namespace Blizzard.IO.RabbitMQ.Tests
 
             // Assert
             _serializerMock.Verify(serializer => serializer.Serialize(_defaultData), Times.Once);
-            _busMock.Verify(bus => bus.Advanced, Times.Exactly(2));
-            _advancedBusMock.Verify(advancedBus => advancedBus.Publish(_exchangeMock.Object, routingKey,
+            _busMock.Verify(bus => bus.Advanced, Times.Once);
+            _advancedBusMock.Verify(advancedBus => advancedBus.Publish(It.IsAny<Exchange>(), routingKey,
                 _defaultIsAbstract, It.IsAny<MessageProperties>(), _defaultSerializedData), Times.Once);
         }
     }
