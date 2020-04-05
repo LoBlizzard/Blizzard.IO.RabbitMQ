@@ -80,7 +80,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void Respond_OnRespondCalledMoreThanOneTime_ShouldThrowInvalidOpertionException()
+        public void Respond_OnRespondCalledMoreThanOneTime_ShouldThrowInvalidOperationException()
         {
             //Arrange
             Func<RequestStub, RespondStub> callback = request => new RespondStub();
