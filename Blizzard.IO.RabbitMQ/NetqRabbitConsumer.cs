@@ -11,7 +11,7 @@ namespace Blizzard.IO.RabbitMQ
     {
         private readonly IBus _netqBus;
         private readonly IDeserializer<TData> _deserializer;
-        private readonly IConcreteTypeDeserializer<TData> _concreteTypeDeserializer;
+        private readonly IAbstractTypeDeserializer<TData> _concreteTypeDeserializer;
         private readonly IQueue _netqQueue;
         private readonly IConverter<MessageProperties, RabbitMessageProperties> _converter;
         private readonly ILogger<NetqRabbitConsumer<TData>> _logger;
@@ -41,7 +41,7 @@ namespace Blizzard.IO.RabbitMQ
                 $" expecting {typeof(TData)} data");
         }
 
-        public NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, IConcreteTypeDeserializer<TData> concreteTypeDeserializer,
+        public NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, IAbstractTypeDeserializer<TData> concreteTypeDeserializer,
             ILoggerFactory loggerFactory, IConverter<MessageProperties, RabbitMessageProperties> coverter = null)
             : this(netqBus, sourceQueue, loggerFactory, coverter)
         {
