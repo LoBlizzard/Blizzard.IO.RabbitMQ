@@ -1,4 +1,4 @@
-﻿using Blizzard.IO.RabbitMQ.Entities;
+using Blizzard.IO.RabbitMQ.Entities;
 using EasyNetQ;
 using EasyNetQ.Topology;
 using Microsoft.Extensions.Logging;
@@ -52,7 +52,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Publish_WithDataOnly_CallsSerializeAdvanceAndPublishOnce()
+        public void Publish_OnCalledWithDataOnly_ShouldCallSerializeAdvanceAndPublishOnce()
         {
             // Act
             _netqRabbitPublisher.Publish(_defaultData);
@@ -65,7 +65,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRoutingKey_CallsSerializeAdvanceAndPublishOnce()
+        public void Publish_OnCalledWithDataAndRoutingKey_ShouldCallSerializeAdvanceAndPublishOnce()
         {
             // Arrange
             string routingKey = "notDefault";
@@ -81,7 +81,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRabbitMessageProperties_CallsSerializeAdvanceAndPublishOnce()
+        public void Publish_OnCalledWithDataAndRabbitMessageProperties_ShouldCallSerializeAdvanceAndPublishOnce()
         {
             // Act
             _netqRabbitPublisher.Publish(_defaultData, new RabbitMessageProperties());
@@ -94,7 +94,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Publish_CalledWithDataAndRabbitMessagePropertiesAndRoutingKey_CallsSerializeAdvanceAndPublishOnce()
+        public void Publish_OnCalledWithDataAndRabbitMessagePropertiesAndRoutingKey_ShouldCallSerializeAdvanceAndPublishOnce()
         {
             // Arrange
             string routingKey = "notDefault";
