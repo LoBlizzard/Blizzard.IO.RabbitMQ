@@ -123,7 +123,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void RespondAsync_OnInValidRpcType_ShouldThrowInvalidOpertionException()
+        public void RespondAsync_OnInValidRpcType_ShouldThrowInvalidOperationException()
         {
             //Arrange
             Func<RequestStub, Task<RespondStub>> callback = request => Task.Factory.StartNew(() => new RespondStub());
