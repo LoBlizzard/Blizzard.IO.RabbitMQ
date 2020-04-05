@@ -3,6 +3,7 @@ using EasyNetQ;
 using EasyNetQ.Topology;
 using Moq;
 using NUnit.Framework;
+using ISerializer = Blizzard.IO.Core.ISerializer<string>;
 
 namespace Blizzard.IO.RabbitMQ.Tests
 {
@@ -10,7 +11,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
     class NetqRabbitPublisherTests
     {
         private Mock<IBus> _busMock;
-        private Mock<Core.ISerializer<string>> _serializerMock;
+        private Mock<ISerializer> _serializerMock;
         private Mock<IAdvancedBus> _advancedBusMock;
         private Mock<IExchange> _exchangeMock;
 
