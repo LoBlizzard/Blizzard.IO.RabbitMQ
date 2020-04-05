@@ -18,7 +18,7 @@ namespace Blizzard.IO.RabbitMQ
         private readonly ILogger _logger;
 
         public NetqRabbitPublisher(IBus netqBus, ISerializer<TData> serializer,
-            RabbitExchange destinationExchange, ILoggerFactory loggerFactory, bool isAbstract = false, string routingKey = "/")
+            RabbitExchange destinationExchange, ILoggerFactory loggerFactory, IConverter<RabbitMessageProperties, MessageProperties> rabbitMessagePropertiesToMessagePropertiesConverter = null, bool isAbstract = false, string routingKey = "/")
         {
             _netqBus = netqBus;
             _serializer = serializer;
@@ -26,7 +26,7 @@ namespace Blizzard.IO.RabbitMQ
 
             _isAbstract = isAbstract;
             _routingKey = routingKey;
-            _rabbitMessagePropertiesToMessagePropertiesConverter = new RabbitPropertiesConverter();
+            _rabbitMessagePropertiesToMessagePropertiesConverter = rabbitMessagePropertiesToMessagePropertiesConverter ?? new RabbitPropertiesConverter();
 
             _logger = loggerFactory.CreateLogger(nameof(NetqRabbitPublisher<TData>));
         }
