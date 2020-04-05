@@ -15,10 +15,10 @@ namespace Blizzard.IO.RabbitMQ.Tests
         private Mock<IBus> _netqBusMock;
         private Mock<IAdvancedBus> _netqAdvancedBusMock;
         private Mock<IDeserializer<int>> _deserializerMock;
-        private Mock<IConcreteTypeDeserializer<int>> _abstractTypeDeserializerMock;
-        private Mock<IQueue> _sourceQueueMock;
+        private Mock<IAbstractTypeDeserializer<int>> _abstractTypeDeserializerMock;
         private Mock<IConverter<MessageProperties, RabbitMessageProperties>> _converterMock;
         private ILoggerFactory _loggerFactory;
+        private RabbitQueue _sourceQueue;
 
         private NetqRabbitConsumer<int> _netqRabbitConsumer;
 
@@ -28,19 +28,19 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _netqBusMock = new Mock<IBus>();
             _netqAdvancedBusMock = new Mock<IAdvancedBus>();
             _deserializerMock = new Mock<IDeserializer<int>>();
-            _abstractTypeDeserializerMock = new Mock<IConcreteTypeDeserializer<int>>();
-            _sourceQueueMock = new Mock<IQueue>();
+            _abstractTypeDeserializerMock = new Mock<IAbstractTypeDeserializer<int>>();
+            _sourceQueue = new RabbitQueue { Name = "EXAMPLE", Exclusive = false};
             _converterMock = new Mock<IConverter<MessageProperties, RabbitMessageProperties>>();
             _loggerFactory = new LoggerFactory();
 
             _netqBusMock.SetupGet(bus => bus.Advanced).Returns(_netqAdvancedBusMock.Object);
 
-            _netqRabbitConsumer = new NetqRabbitConsumer<int>(_netqBusMock.Object, _sourceQueueMock.Object,
+            _netqRabbitConsumer = new NetqRabbitConsumer<int>(_netqBusMock.Object, _sourceQueue,
                 _deserializerMock.Object, _loggerFactory, _converterMock.Object);
         }
 
         [Test]
-        public void Start_OnStartConsuming_ShouldStartConsumingFromSourceQueue()
+        public void Start_OnStartConsuming_ShouldTriggerConsumeOnce()
         {
             // Arrange
             _netqAdvancedBusMock.Setup(bus => bus.Consume(It.IsAny<IQueue>(),
@@ -51,7 +51,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
 
             // Assert
             _netqAdvancedBusMock.Verify(bus =>
-                bus.Consume(_sourceQueueMock.Object, It.IsAny<Action<byte[], MessageProperties, MessageReceivedInfo>>()),
+                bus.Consume(It.IsAny<IQueue>(), It.IsAny<Action<byte[], MessageProperties, MessageReceivedInfo>>()),
                 Times.Once);
         }
 
@@ -84,7 +84,7 @@ namespace Blizzard.IO.RabbitMQ.Tests
 
             // Assert
             _netqAdvancedBusMock.Verify(bus =>
-                bus.Consume(_sourceQueueMock.Object, It.IsAny<Action<byte[], MessageProperties, MessageReceivedInfo>>()),
+                bus.Consume(It.IsAny<IQueue>(), It.IsAny<Action<byte[], MessageProperties, MessageReceivedInfo>>()),
                 Times.Never);
         }
     }
