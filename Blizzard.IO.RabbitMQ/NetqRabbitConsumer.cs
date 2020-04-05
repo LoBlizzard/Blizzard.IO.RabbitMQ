@@ -12,81 +12,80 @@ namespace Blizzard.IO.RabbitMQ
         private readonly IBus _netqBus;
         private readonly IDeserializer<TData> _deserializer;
         private readonly IConcreteTypeDeserializer<TData> _concreteTypeDeserializer;
-        private readonly IQueue _sourceQueue;
+        private readonly IQueue _netqQueue;
         private readonly IConverter<MessageProperties, RabbitMessageProperties> _converter;
         private readonly ILogger<NetqRabbitConsumer<TData>> _logger;
         
-        private IDisposable _consumeTask;
-        private readonly Action<byte[], MessageProperties, MessageReceivedInfo> _consumingStrategy;
+        private IDisposable _consumeHandler;
+        private readonly Func<byte[], MessageProperties, TData> _dataExtractionStrategy;
 
         public event Action<TData> MessageReceived;
         public event Action<TData, RabbitMessageProperties> MessageWithMetadataReceived;
 
-        protected NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue, ILoggerFactory loggerFactory,
+        protected NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, ILoggerFactory loggerFactory,
             IConverter<MessageProperties, RabbitMessageProperties> coverter)
         {
             _netqBus = netqBus;
-            _sourceQueue = sourceQueue;
+            _netqQueue = new Queue(sourceQueue.Name, sourceQueue.Exclusive);
             _logger = loggerFactory.CreateLogger<NetqRabbitConsumer<TData>>();
             _converter = coverter ?? new RabbitPropertiesConverter();
         }
 
-        public NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue, IDeserializer<TData> deserializer, 
+        public NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, IDeserializer<TData> deserializer, 
             ILoggerFactory loggerFactory, IConverter<MessageProperties, RabbitMessageProperties> coverter = null)
             : this(netqBus, sourceQueue, loggerFactory, coverter)
         {
             _deserializer = deserializer;
-            _consumingStrategy += ConsumeViaDeserializer;
-            _logger.LogDebug($"Initialized consumer from queue: {_sourceQueue.Name}," +
-                $" expecting {typeof(TData).ToString()} data");
+            _dataExtractionStrategy += ExtractData;
+            _logger.LogDebug($"Initialized consumer from queue: {_netqQueue.Name}," +
+                $" expecting {typeof(TData)} data");
         }
 
-        public NetqRabbitConsumer(IBus netqBus, IQueue sourceQueue, IConcreteTypeDeserializer<TData> concreteTypeDeserializer,
+        public NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, IConcreteTypeDeserializer<TData> concreteTypeDeserializer,
             ILoggerFactory loggerFactory, IConverter<MessageProperties, RabbitMessageProperties> coverter = null)
             : this(netqBus, sourceQueue, loggerFactory, coverter)
         {
             _concreteTypeDeserializer = concreteTypeDeserializer;
-            _consumingStrategy += ConsumeViaConcreteDeserializer;
-            _logger.LogDebug($"Initialized consumer from queue: {_sourceQueue.Name}," +
-                $" expecting {typeof(TData).ToString()} derieved data");
+            _dataExtractionStrategy += ExtractAbstractData;
+            _logger.LogDebug($"Initialized consumer from queue: {_netqQueue.Name}," +
+                $" expecting {typeof(TData)} derieved data");
         }
 
         public void Start()
         {
-            _consumeTask = _netqBus.Advanced.Consume(_sourceQueue, _consumingStrategy);
+            _consumeHandler = _netqBus.Advanced.Consume(_netqQueue, (messageBytes, messageProperties, messageIndo) =>
+            {
+                TData data = _dataExtractionStrategy.Invoke(messageBytes, messageProperties);
+                RabbitMessageProperties properties = _converter.Convert(messageProperties);
+                MessageReceived?.Invoke(data);
+                MessageWithMetadataReceived?.Invoke(data, properties);
+            });
+
             _logger.LogInformation("Started consumer sucessfully");
         }
 
-        private void ConsumeViaDeserializer(byte[] messageBytes, MessageProperties messageProperties,
-            MessageReceivedInfo messageInfo)
+        private TData ExtractData(byte[] messageBytes, MessageProperties messageProperties)
         {
-            TData data = _deserializer.Deserialize(messageBytes);
-            RabbitMessageProperties properties = _converter.Convert(messageProperties);
-            MessageReceived?.Invoke(data);
-            MessageWithMetadataReceived?.Invoke(data, properties);
+            return _deserializer.Deserialize(messageBytes);
         }
 
-        private void ConsumeViaConcreteDeserializer(byte[] messageBytes, MessageProperties messageProperties,
-            MessageReceivedInfo messageInfo)
+        private TData ExtractAbstractData(byte[] messageBytes, MessageProperties messageProperties)
         {
-            Type messageConcreteType = messageProperties.Type.GetType();
-            TData data = _concreteTypeDeserializer.Deserialize(messageBytes, messageConcreteType);
-            RabbitMessageProperties properties = _converter.Convert(messageProperties);
-            MessageReceived?.Invoke(data);
-            MessageWithMetadataReceived?.Invoke(data, properties);
+            Type messageConcreteType = Type.GetType(messageProperties.Type);
+            return _concreteTypeDeserializer.Deserialize(messageBytes, messageConcreteType);
         }
 
         public void Stop()
         {
-            if (_consumeTask == null)
+            if (_consumeHandler == null)
             {
-                _logger.LogInformation("Couldn't stop consumer, please make sure it was started");
+                _logger.LogWarning("Couldn't stop consumer, please make sure it was started");
             }
             else
             {
-                _consumeTask.Dispose();
-                _consumeTask = null;
-                _logger.LogInformation("Stopped consuming data succesfully");
+                _consumeHandler.Dispose();
+                _consumeHandler = null;
+                _logger.LogInformation($"Stopped consuming data from queue: {_netqQueue.Name} succesfully");
             }
         }
     }
