@@ -10,12 +10,14 @@ namespace Blizzard.IO.RabbitMQ.Rpc
     {
         private readonly INetqRpcRabbitConnection<Func<Type,object>> _netqRpcRabbitConnection;
         private IDisposable _respondHandler;
+        private bool _isStarted;
         private readonly ILogger _logger;
 
         public NetqRabbitRpcServer(INetqRpcRabbitConnection<Func<Type,object>> netqRpcRabbitConnection, ILoggerFactory loggerFactory)
         {
             _netqRpcRabbitConnection = netqRpcRabbitConnection;
             _respondHandler = null;
+            _isStarted = false;
             _logger = loggerFactory.CreateLogger(nameof(NetqRabbitRpcServer));
         }
 
@@ -42,6 +44,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
                 throw new InvalidOperationException($"Cannot start responding rpc type is invalid, rpc type: {_netqRpcRabbitConnection.RpcMessageType}");
             }
 
+            _isStarted = true;
             _logger.LogInformation($"Started responding on bus: {_netqRpcRabbitConnection.Bus}, of type {_netqRpcRabbitConnection.RpcMessageType}");
         }
 
@@ -67,15 +70,17 @@ namespace Blizzard.IO.RabbitMQ.Rpc
                 throw new InvalidOperationException($"Cannot start responding rpc type is invalid, rpc type: {_netqRpcRabbitConnection.RpcMessageType}");
             }
 
+            _isStarted = true;
             _logger.LogInformation($"Started responding async on bus: {_netqRpcRabbitConnection.Bus}, of type {_netqRpcRabbitConnection.RpcMessageType}");
         }
 
         public void Stop()
         {
-            if (_respondHandler != null)
+            if (_isStarted)
             {
                 _respondHandler.Dispose();
                 _respondHandler = null;
+                _isStarted = false;
                 _logger.LogInformation($"Stoped responding on bus: {_netqRpcRabbitConnection.Bus}, of type {_netqRpcRabbitConnection.RpcMessageType}");
             }
             else
@@ -86,7 +91,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
 
         private void VerifyServerHasntStartedYet()
         {
-            if (_respondHandler != null)
+            if (_isStarted)
             {
                 throw new InvalidOperationException($"Error this server already responding");
             }
