@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.Core", "Blizzar
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SubModules", "SubModules", "{7BD0B07F-CFEA-4AB7-9D42-A84278157B7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blizzard.IO.RabbitMQ.Tests", "Blizzard.IO.RabbitMQ.Tests\Blizzard.IO.RabbitMQ.Tests.csproj", "{52AAF175-8C8E-4898-8C02-F631BCFAFF24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.RabbitMQ.Tests", "Blizzard.IO.RabbitMQ.Tests\Blizzard.IO.RabbitMQ.Tests.csproj", "{52AAF175-8C8E-4898-8C02-F631BCFAFF24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
