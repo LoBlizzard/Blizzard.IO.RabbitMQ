@@ -13,9 +13,9 @@ namespace Blizzard.IO.RabbitMQ.Rpc
         public RpcMessageType RpcMessageType { get; }
         private readonly ILogger<NetqRabbitRpcConnection> _logger;
 
-        public NetqRabbitRpcConnection(RpcConfiguration configuration, string hostname, string username, string password, ILoggerFactory loggerFactory, 
-            int heartBeat = 10, int preFetch = 50, ushort timeout = 10,bool publisherConfirms = false, bool persistent = true, string product = null, 
-            string platform = null, string virtualHost = null,ISerializer serializer = null, RpcMessageType rpcMessageType = RpcMessageType.Concrete)
+        public NetqRabbitRpcConnection(RpcConfiguration configuration, string hostname, string username, string password, ILoggerFactory loggerFactory,
+            ISerializer serializer, int heartBeat = 10, int preFetch = 50, ushort timeout = 10,bool publisherConfirms = false, bool persistent = true, 
+            string product = null, string platform = null, string virtualHost = null, RpcMessageType rpcMessageType = RpcMessageType.Concrete)
         {
             _logger = loggerFactory.CreateLogger<NetqRabbitRpcConnection>();
             RpcMessageType = rpcMessageType;
@@ -47,18 +47,18 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             bool publisherConfirms, bool persistent, string product,string platform, string virtualHost)
         {
             string connectionString = $"host={hostname};username={username};password={password};requestedHeartbeat={heartBeat};prefetchcount={preFetch};" +
-                $"persistentMessages={persistent};publisherConfirms={publisherConfirms};timeout={timeout};";
+                $"persistentMessages={persistent};publisherConfirms={publisherConfirms};timeout={timeout}";
             if (product != null)
             {
-                connectionString += $"product={product}";
+                connectionString += $";product={product}";
             }
             if (platform != null)
             {
-                connectionString += $"platform={platform}";
+                connectionString += $";platform={platform}";
             }
             if (virtualHost != null)
             {
-                connectionString += $"virtualHost={virtualHost}";
+                connectionString += $";virtualHost={virtualHost}";
             }
 
             return connectionString;
