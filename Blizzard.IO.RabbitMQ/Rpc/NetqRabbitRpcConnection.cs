@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public class NetqRabbitRpcConnection : INetqRpcRabbitConnection<Func<Type, object>>
+    public class NetqRabbitRpcConnection : INetqRpcRabbitConnection<Func<Type, object>>, IDisposable
     {
         public IBus Bus { get; }
         public RpcMessageType RpcMessageType { get; }
@@ -62,6 +62,11 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             }
 
             return connectionString;
+        }
+
+        public void Dispose()
+        {
+            Bus.Dispose();
         }
     }
 }
