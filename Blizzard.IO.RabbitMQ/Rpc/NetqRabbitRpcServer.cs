@@ -15,8 +15,8 @@ namespace Blizzard.IO.RabbitMQ.Rpc
         public NetqRabbitRpcServer(INetqRpcRabbitConnection<Func<Type,object>> netqRpcRabbitConnection, ILoggerFactory loggerFactory)
         {
             _netqRpcRabbitConnection = netqRpcRabbitConnection;
-            _logger = loggerFactory.CreateLogger(nameof(NetqRabbitRpcServer));
             _respondHandler = null;
+            _logger = loggerFactory.CreateLogger(nameof(NetqRabbitRpcServer));
         }
 
         public void Respond<TRequest, TRespond>(Func<TRequest, TRespond> callback)
