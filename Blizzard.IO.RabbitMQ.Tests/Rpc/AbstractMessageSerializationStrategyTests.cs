@@ -73,12 +73,12 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             SerializedMessage output = _abstractMessageSerializationStrategy.SerializeMessage(message);
 
             //Assert
-            _typeNameSerializerMock.Verify(serializer => serializer.Serialize(It.IsAny<Type>()));
-            _serializerMock.Verify(serializer => serializer.Serialize(It.IsAny<object>()));
+            _typeNameSerializerMock.Verify(serializer => serializer.Serialize(data.GetType()), Times.Once);
+            _serializerMock.Verify(serializer => serializer.Serialize(data), Times.Once);
         }
 
         [Test]
-        public void DeserializeMessage_OnValidMessagePropertiesAndData_ShouldReturnValidMessageWithValidFunc()
+        public void DeserializeMessage_OnDataBytesAndTypeOfData_ShouldReturnMessageWithThatBodyAndType()
         {
             //Arrange
             long data = 1000;
@@ -99,6 +99,36 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             //Assert
             var outputData = (long)output.Body;
             Assert.True(data == outputData);
+        }
+
+        [Test]
+        public void DeserializeMessage_OnValidMessagePropertiesAndData_ShouldCallTheCorrectDependencies()
+        {
+            //Arrange
+            long data = 1000;
+
+            var serializedData = new byte[]
+            {
+                0,1,2,3,4,5
+            };
+
+            string typeName = "type_name";
+
+            _serializerMock.Setup(sr => sr.Deserialize(It.IsAny<byte[]>(), It.IsAny<Type>())).Returns(data);
+            _typeNameSerializerMock.Setup(tns => tns.DeSerialize(It.IsAny<string>())).Returns(typeof(long));
+            MessageProperties messageProperties = new MessageProperties 
+            {
+                Type = typeName
+            };
+
+            //Act
+            Message<long> output = (Message<long>)_abstractMessageSerializationStrategy
+                .DeserializeMessage(messageProperties, serializedData);
+
+            //Assert
+
+            _typeNameSerializerMock.Verify(serializer => serializer.DeSerialize(typeName), Times.Once);
+            _serializerMock.Verify(serializer => serializer.Deserialize(serializedData, typeof(long)), Times.Once);
         }
     }
 }

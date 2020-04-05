@@ -22,7 +22,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void SerializeMessage_OnValidIMessage_ShouldReturnsValidSerializedMessage()
+        public void SerializeMessage_OnMessage_ShouldReturnsSerializedMessageWithSamePropertiesAndContentBytesAsMessage()
         {
             //Arrange
             long data = 1000;
@@ -47,7 +47,31 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void DeserializeMessage_OnValidMessagePropertiesAndData_ShouldReturnValidMessageWithValidFunc()
+        public void SerializeMessage_OnMessage_ShouldCallTheCorrectDependencies()
+        {
+            //Arrange
+            long data = 1000;
+
+            var serializedData = new byte[]
+            {
+                0,1,2,3,4,5
+            };
+
+            _serializerMock.Setup(sr => sr.Serialize(It.IsAny<long>())).Returns(serializedData);
+            MessageProperties messageProperties = new MessageProperties();
+
+
+            IMessage message = new Message<long>(data, messageProperties);
+
+            //Act
+            SerializedMessage output = _concreteMessageSerializationStrategy.SerializeMessage(message);
+
+            //Assert
+            _serializerMock.Verify(serializer => serializer.Serialize(data), Times.Once);
+        }
+
+        [Test]
+        public void DeserializeMessage_OnPropertiesAndBodyBytes_ShouldReturnMessageWithSamePropertiesAndFuncForFutureObjectConstruction()
         {
             //Arrange
             long data = 1000;
