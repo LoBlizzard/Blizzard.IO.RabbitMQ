@@ -27,7 +27,7 @@ namespace Blizzard.IO.RabbitMQ
         {
             _netqBus = netqBus;
             _netqQueue = new Queue(sourceQueue.Name, sourceQueue.Exclusive);
-            _logger = loggerFactory.CreateLogger(typeof(NetqRabbitConsumer<TData>));
+            _logger = loggerFactory.CreateLogger(nameof(NetqRabbitConsumer<TData>));
             _converter = coverter ?? new RabbitPropertiesConverter();
         }
 
@@ -57,8 +57,8 @@ namespace Blizzard.IO.RabbitMQ
             {
                 TData data = _dataExtractionStrategy.Invoke(messageBytes, messageProperties);
                 RabbitMessageProperties properties = _converter.Convert(messageProperties);
-                MessageReceived?.Invoke(data);
-                MessageWithMetadataReceived?.Invoke(data, properties);
+                MessageReceived(data);
+                MessageWithMetadataReceived(data, properties);
             });
 
             _logger.LogInformation("Started consumer sucessfully");

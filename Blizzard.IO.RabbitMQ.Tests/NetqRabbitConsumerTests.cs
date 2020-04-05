@@ -66,9 +66,9 @@ namespace Blizzard.IO.RabbitMQ.Tests
             _netqAdvancedBusMock.Setup(bus => bus.Consume(It.IsAny<IQueue>(),
                 It.IsAny<Action<byte[], MessageProperties, MessageReceivedInfo>>()))
                 .Returns(cancelTokenMock.Object);
+            _netqRabbitConsumer.Start();
 
             // Act
-            _netqRabbitConsumer.Start();
             _netqRabbitConsumer.Stop();
 
             // Assert
