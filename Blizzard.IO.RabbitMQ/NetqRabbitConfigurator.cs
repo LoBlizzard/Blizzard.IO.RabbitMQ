@@ -10,36 +10,57 @@ namespace Blizzard.IO.RabbitMQ
     public class NetqRabbitConfigurator : IRabbitConfigurator
     {
         private readonly IBus _netqBus;
-        private readonly ILogger<NetqRabbitConfigurator> _logger;
+        private readonly ILogger _logger;
 
-        public NetqRabbitConfigurator(IBus netqBus, ILogger<NetqRabbitConfigurator> logger)
+        public NetqRabbitConfigurator(IBus netqBus, ILoggerFactory loggerFactory)
         {
-            _netqBus = netqBus ?? throw new ArgumentNullException(nameof(netqBus));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _netqBus = netqBus;
+            _logger = loggerFactory.CreateLogger(typeof(NetqRabbitConfigurator));
         }
 
         public void Configure(RabbitConfiguration configuration)
         {
-            var nameToNetqExchange = new Dictionary<string, IExchange>();
-            var nameToNetqQueue = new Dictionary<string, IQueue>();
+            IDictionary<string, IExchange> nameToNetqExchange = DeclareExchanges(configuration.Exchanges);
+            IDictionary<string, IQueue> nameToNetqQueue = DeclareQueues(configuration.Queues);
 
-            foreach (RabbitExchange exchange in configuration.Exchanges)
+            DeclareExchangeToExchangeBindings(configuration.ExchangeToExchangeBindings, nameToNetqExchange);
+            DeclareExchangeToQueueBindings(configuration.ExchangeToQueueBindings, nameToNetqExchange, nameToNetqQueue);
+
+            _logger.LogInformation("Declared topology succesfully on bus");
+        }
+
+        private void DeclareExchangeToQueueBindings(IReadOnlyCollection<RabbitBinding> bindings,
+            IDictionary<string, IExchange> nameToNetqExchange, IDictionary<string, IQueue> nameToNetqQueue)
+        {
+            foreach (RabbitBinding binding in bindings)
             {
-                nameToNetqExchange[exchange.Name] = _netqBus.Advanced.ExchangeDeclare(
-                    exchange.Name,
-                    Utilities.ExchangeTypeToStringResolver[exchange.Type],
-                    exchange.Passive,
-                    exchange.Durable,
-                    exchange.AutoDelete,
-                    exchange.Internal,
-                    exchange.AlternateExchange,
-                    exchange.Delayed
+                _netqBus.Advanced.Bind(
+                    nameToNetqExchange[binding.SourceName],
+                    nameToNetqQueue[binding.DestName],
+                    binding.RoutingKey
                     );
-
-                _logger.LogDebug($"Declared exchange: {exchange.Name} succesfully");
+                _logger.LogDebug($"Bind exchange: {binding.SourceName} to queue: {binding.DestName}");
             }
+        }
 
-            foreach (RabbitQueue queue in configuration.Queues)
+        private void DeclareExchangeToExchangeBindings(IReadOnlyCollection<RabbitBinding> bindings,
+            IDictionary<string, IExchange> nameToNetqExchange)
+        {
+            foreach (RabbitBinding binding in bindings)
+            {
+                _netqBus.Advanced.Bind(
+                    nameToNetqExchange[binding.SourceName],
+                    nameToNetqExchange[binding.DestName],
+                    binding.RoutingKey
+                    );
+                _logger.LogDebug($"Bind exchange: {binding.SourceName} to exchange: {binding.DestName}");
+            }
+        }
+
+        private IDictionary<string, IQueue> DeclareQueues(IReadOnlyCollection<RabbitQueue> queues)
+        {
+            var nameToNetqQueue = new Dictionary<string, IQueue>();
+            foreach (RabbitQueue queue in queues)
             {
                 nameToNetqQueue[queue.Name] = _netqBus.Advanced.QueueDeclare(
                     queue.Name,
@@ -59,33 +80,29 @@ namespace Blizzard.IO.RabbitMQ
                 _logger.LogDebug($"Declared queue: {queue.Name} succesfully");
             }
 
-            foreach (RabbitBinding binding in configuration.ExchangeToQueueBindings)
+            return nameToNetqQueue;
+        }
+
+        private IDictionary<string, IExchange> DeclareExchanges(IReadOnlyCollection<RabbitExchange> exchanges)
+        {
+            var nameToNetqExchange = new Dictionary<string, IExchange>();
+            foreach (RabbitExchange exchange in exchanges)
             {
-                _netqBus.Advanced.Bind(
-                    nameToNetqExchange[binding.SourceName],
-                    nameToNetqQueue[binding.DestName],
-                    binding.RoutingKey
+                nameToNetqExchange[exchange.Name] = _netqBus.Advanced.ExchangeDeclare(
+                    exchange.Name,
+                    Utilities.ExchangeTypeToStringResolver[exchange.Type],
+                    exchange.Passive,
+                    exchange.Durable,
+                    exchange.AutoDelete,
+                    exchange.Internal,
+                    exchange.AlternateExchange,
+                    exchange.Delayed
                     );
+
+                _logger.LogDebug($"Declared exchange: {exchange.Name} succesfully");
             }
 
-            _logger.LogDebug("Declared all exchange to queue bindings");
-
-            foreach (RabbitBinding binding in configuration.ExchangeToExchangeBindings)
-            {
-                _netqBus.Advanced.Bind(
-                    nameToNetqExchange[binding.SourceName],
-                    nameToNetqExchange[binding.DestName],
-                    binding.RoutingKey
-                    );
-            }
-
-            _logger.LogDebug("Declared all exchange to exchange bindings");
-
-            nameToNetqExchange.Clear();
-            nameToNetqQueue.Clear();
-            _logger.LogDebug("Cleared all previous declarations");
-
-            _logger.LogInformation("Declared topology succesfully on bus");
+            return nameToNetqExchange;
         }
     }
 }

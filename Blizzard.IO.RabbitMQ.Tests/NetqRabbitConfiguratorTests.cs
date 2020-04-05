@@ -18,7 +18,9 @@ namespace Blizzard.IO.RabbitMQ.Tests
 
         private Mock<IBus> _netqBusMock;
         private Mock<IAdvancedBus> _netqAdvancedBusMock;
-        private Mock<ILogger<NetqRabbitConfigurator>> _loggerMock;
+        private Mock<ILogger> _loggerMock;
+        private Mock<ILoggerFactory> _loggerFactoryMock;
+
         private NetqRabbitConfigurator _netqRabbitConfigurator;
 
         [SetUp]
@@ -60,11 +62,15 @@ namespace Blizzard.IO.RabbitMQ.Tests
                 ExchangeToQueueBindings = new List<RabbitBinding>()
             };
 
-            _loggerMock = new Mock<ILogger<NetqRabbitConfigurator>>();
+            _loggerMock = new Mock<ILogger>();
+            _loggerFactoryMock = new Mock<ILoggerFactory>();
             _netqAdvancedBusMock = new Mock<IAdvancedBus>();
             _netqBusMock = new Mock<IBus>();
+            
             _netqBusMock.SetupGet(bus => bus.Advanced).Returns(_netqAdvancedBusMock.Object);
-            _netqRabbitConfigurator = new NetqRabbitConfigurator(_netqBusMock.Object, _loggerMock.Object);
+            _loggerFactoryMock.Setup(factory => factory.CreateLogger(It.IsAny<string>())).Returns(_loggerMock.Object);
+            
+            _netqRabbitConfigurator = new NetqRabbitConfigurator(_netqBusMock.Object, _loggerFactoryMock.Object);
         }
 
         [Test]
