@@ -90,20 +90,30 @@ namespace Blizzard.IO.RabbitMQ.Tests
         }
 
         [Test]
-        public void Start_OnBothConsumerEventsHasZeroSubscribers_ShouldNotTriggerStart()
+        public void Start_OnBothConsumerEventsHasZeroSubscribers_ShouldThrowInvalidOperationException()
         {
             // Arrange
             SetUpConcreteConsumer();
             _netqAdvancedBusMock.Setup(bus => bus.Consume(It.IsAny<IQueue>(),
                 It.IsAny<Action<byte[], MessageProperties, MessageReceivedInfo>>()));
 
-            // Act
+            // Act + Assert
+            Assert.That(() => _netqRabbitConsumer.Start(), Throws.TypeOf<InvalidOperationException>());            
+        }
+
+        [Test]
+        public void Start_OnTryingToStartConsumerTwice_ShouldThrowInvalidOperationException()
+        {
+            // Arrange
+            SetUpConcreteConsumer();
+            _netqRabbitConsumer.MessageReceived += x => { };
+            var disposableMock = new Mock<IDisposable>();
+            _netqAdvancedBusMock.Setup(bus => bus.Consume(It.IsAny<IQueue>(),
+                It.IsAny<Action<byte[], MessageProperties, MessageReceivedInfo>>())).Returns(disposableMock.Object);
             _netqRabbitConsumer.Start();
 
-            // Assert
-            _netqAdvancedBusMock.Verify(bus =>
-                bus.Consume(It.IsAny<IQueue>(), It.IsAny<Action<byte[], MessageProperties, MessageReceivedInfo>>()),
-                Times.Never);
+            // Act + Assert
+            Assert.That(() => _netqRabbitConsumer.Start(), Throws.TypeOf<InvalidOperationException>());
         }
 
         [Test]

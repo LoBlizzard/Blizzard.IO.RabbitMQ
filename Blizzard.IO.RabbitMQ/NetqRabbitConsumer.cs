@@ -56,7 +56,11 @@ namespace Blizzard.IO.RabbitMQ
         {
             if (MessageReceived == null && MessageWithMetadataReceived == null)
             {
-                _logger.LogWarning("Couldn't start consumer, must have at least one subscriber in order to start");
+                throw new InvalidOperationException("Couldn't start consumer, must have at least one subscriber in order to start");
+            }
+            else if (_consumeHandler != null)
+            {
+                throw new InvalidOperationException("Consumer already started, couldn't start it again");
             }
             else
             {
