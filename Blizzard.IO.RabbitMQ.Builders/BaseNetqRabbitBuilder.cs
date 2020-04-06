@@ -6,7 +6,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
 {
     public abstract class BaseNetqRabbitBuilder
     {
-        private static Dictionary<string, IBus> netqRabbitConnections = new Dictionary<string, IBus>();
+        private static Dictionary<ConnectionKey, IBus> netqRabbitConnections = new Dictionary<ConnectionKey, IBus>();
 
         protected IBus InitConnection(
             string host,
@@ -21,7 +21,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
             bool publisherConfirms = false,
             bool persistentMessages = true)
         {
-            string busKey = $"{host}{username}{password}";
+            ConnectionKey busKey = new ConnectionKey(host, username, password);
             if (netqRabbitConnections.ContainsKey(busKey))
             {
                 return netqRabbitConnections[busKey];
