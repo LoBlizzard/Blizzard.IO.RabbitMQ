@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public interface INetqRpcRabbitConnection<T>
+    public interface INetqRabbitRpcConnection<T>
         where T : class
     {
         IBus Bus { get; }
