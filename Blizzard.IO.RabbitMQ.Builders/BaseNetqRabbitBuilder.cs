@@ -1,34 +1,45 @@
 ﻿using System.Collections.Generic;
 using EasyNetQ;
+using Blizzard.IO.RabbitMQ.Extensions;
 
 namespace Blizzard.IO.RabbitMQ.Builders
 {
     public abstract class BaseNetqRabbitBuilder
     {
-        protected static Dictionary<string, IBus> NetqRabbitConnections { get; private set; }
+        private static Dictionary<string, IBus> netqRabbitConnections;
 
         protected BaseNetqRabbitBuilder()
         {
-            if (NetqRabbitConnections == null)
+            if (netqRabbitConnections == null)
             {
-                NetqRabbitConnections = new Dictionary<string, IBus>();
+                netqRabbitConnections = new Dictionary<string, IBus>();
             }
         }
 
-        protected IBus InitConnection(string host, string password, string username)
+        protected IBus InitConnection(
+            string host,
+            string password,
+            string username,
+            ushort timeout = 10,
+            string product = "",
+            string platform = "",
+            string virtualHost = "/",
+            int requestHeartbeat = 10,
+            int prefetchCount = 50,
+            bool publisherConfirms = false,
+            bool persistentMessages = true)
         {
-            string busKey = $"{host};{username};{password}";
-            if (NetqRabbitConnections.TryGetValue(busKey, out IBus bus))
+            string busKey = $"{host}{username}{password}";
+            if (netqRabbitConnections.ContainsKey(busKey))
             {
-                return bus;
+                return netqRabbitConnections[busKey];
             }
 
-            NetqRabbitConnections.Add(busKey, )
-        }
+            IBus bus = BusExtensions.CreateBus(host, username, password, timeout, product, platform, virtualHost, 
+                requestHeartbeat, prefetchCount, publisherConfirms, persistentMessages);
+            netqRabbitConnections.Add(busKey, bus);
 
-        private IBus CreateBus(string host, string password, string username)
-        {
-            return RabbitHutch.CreateBus()
+            return bus;
         }
     }
 }
