@@ -58,22 +58,21 @@ namespace Blizzard.IO.RabbitMQ
             {
                 throw new InvalidOperationException("Couldn't start consumer, must have at least one subscriber in order to start");
             }
-            else if (_consumeHandler != null)
+
+            if (_consumeHandler != null)
             {
                 throw new InvalidOperationException("Consumer already started, couldn't start it again");
             }
-            else
-            {
-                _consumeHandler = _netqBus.Advanced.Consume(_netqQueue, (messageBytes, messageProperties, messageIndo) =>
-                {
-                    TData data = _dataExtractionStrategy(messageBytes, messageProperties);
-                    RabbitMessageProperties properties = _messagePropertiesToRabbitMessagePropertiesConverter.Convert(messageProperties);
-                    MessageReceived?.Invoke(data);
-                    MessageWithMetadataReceived?.Invoke(data, properties);
-                });
 
-                _logger.LogInformation("Started consumer sucessfully");
-            }
+            _consumeHandler = _netqBus.Advanced.Consume(_netqQueue, (messageBytes, messageProperties, messageIndo) =>
+            {
+                TData data = _dataExtractionStrategy(messageBytes, messageProperties);
+                RabbitMessageProperties properties = _messagePropertiesToRabbitMessagePropertiesConverter.Convert(messageProperties);
+                MessageReceived?.Invoke(data);
+                MessageWithMetadataReceived?.Invoke(data, properties);
+            });
+
+            _logger.LogInformation("Started consumer sucessfully");
         }
 
         private TData ExtractConcreteData(byte[] messageBytes, MessageProperties messageProperties)
