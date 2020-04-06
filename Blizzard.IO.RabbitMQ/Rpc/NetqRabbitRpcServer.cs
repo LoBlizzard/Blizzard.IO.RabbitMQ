@@ -29,7 +29,6 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             if (_netqRabbitRpcConnection.RpcMessageType == RpcMessageType.Abstract)
             {
                 _respondHandler = _netqRabbitRpcConnection.Bus.Respond<TRequest, TRespond>(callback);
-                _logger.LogInformation($"Started responding on bus: {_netqRabbitRpcConnection.Bus}, of type {_netqRabbitRpcConnection.RpcMessageType}");
             }
             else if (_netqRabbitRpcConnection.RpcMessageType == RpcMessageType.Concrete)
             {
