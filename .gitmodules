@@ -2,3 +2,6 @@
 	path = Blizzard.IO.Core
 	url = https://github.com/LoBlizzard/Blizzard.IO.Core.git
 	branch = dev
+[submodule "Blizzard.IO.Serialization"]
+	path = Blizzard.IO.Serialization
+	url = https://github.com/LoBlizzard/Blizzard.IO.Serialization.git
