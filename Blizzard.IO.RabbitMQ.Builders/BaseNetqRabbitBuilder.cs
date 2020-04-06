@@ -6,15 +6,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
 {
     public abstract class BaseNetqRabbitBuilder
     {
-        private static Dictionary<string, IBus> netqRabbitConnections;
-
-        protected BaseNetqRabbitBuilder()
-        {
-            if (netqRabbitConnections == null)
-            {
-                netqRabbitConnections = new Dictionary<string, IBus>();
-            }
-        }
+        private static Dictionary<string, IBus> netqRabbitConnections = new Dictionary<string, IBus>();
 
         protected IBus InitConnection(
             string host,
