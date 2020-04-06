@@ -7,7 +7,7 @@ using System;
 
 namespace Blizzard.IO.RabbitMQ.Builders.Rpc
 {
-    public class NetqRabbitRpcClientBuilder : BaseNetqRabbitRpcBuilder
+    public class NetqRabbitRpcBuilder : BaseNetqRabbitRpcBuilder
     {
         private ISerializer _serializer = new JsonSerializer();
         private string _hostname = "localhost";
@@ -29,17 +29,17 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
         private bool _persistentMessages = true;
 
 
-        public NetqRabbitRpcClientBuilder(ILoggerFactory loggerFactory) : base(loggerFactory)
+        public NetqRabbitRpcBuilder(ILoggerFactory loggerFactory) : base(loggerFactory)
         {
         }
 
-        public NetqRabbitRpcClientBuilder AddRpcMessageType(RpcMessageType rpcMessageType)
+        public NetqRabbitRpcBuilder AddRpcMessageType(RpcMessageType rpcMessageType)
         {
             _rpcMessageType = rpcMessageType;
             return this;
         }
 
-        public NetqRabbitRpcClientBuilder AddRabbitConnectionProperties(
+        public NetqRabbitRpcBuilder AddRabbitConnectionProperties(
             ushort timeout = 10,
             string product = null,
             string platform = null,
@@ -60,7 +60,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
             return this;
         }
 
-        public NetqRabbitRpcClientBuilder AddCredentials(string hostname, string username, string password)
+        public NetqRabbitRpcBuilder AddCredentials(string hostname, string username, string password)
         {
             _hostname = hostname;
             _username = username;
@@ -68,24 +68,32 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
             return this;
         }
 
-        public NetqRabbitRpcClientBuilder AddSerializer(ISerializer serializer)
+        public NetqRabbitRpcBuilder AddSerializer(ISerializer serializer)
         {
             _serializer = serializer;
             return this;
         }
 
-        public NetqRabbitRpcClientBuilder AddRpcConfiguration(RpcConfiguration rpcConfiguration)
+        public NetqRabbitRpcBuilder AddRpcConfiguration(RpcConfiguration rpcConfiguration)
         {
             _rpcConfiguration = rpcConfiguration;
             return this;
         }
 
-        public IRpcClient Build()
+        public IRpcClient BuildClient()
         {
             INetqRabbitRpcConnection<Func<Type, object>> connection = InitConnection(_hostname, _password, _username, _rpcConfiguration, _serializer,
                 _rpcMessageType, _timeout, _product, _platform, _virtualHost, _requestHeartbeat, _prefetchCount, _publisherConfirms, _persistentMessages);
 
             return new NetqRabbitRpcClient(connection, LoggerFactory);
+        }
+
+        public IRpcServer BuildServer()
+        {
+            INetqRabbitRpcConnection<Func<Type, object>> connection = InitConnection(_hostname, _password, _username, _rpcConfiguration, _serializer,
+                _rpcMessageType, _timeout, _product, _platform, _virtualHost, _requestHeartbeat, _prefetchCount, _publisherConfirms, _persistentMessages);
+
+            return new NetqRabbitRpcServer(connection, LoggerFactory);
         }
     }
 }
