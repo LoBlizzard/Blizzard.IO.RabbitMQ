@@ -43,7 +43,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             _server.Respond<RequestStub, RespondStub>(Callback);
 
             //Assert
-            _busMock.Verify(bus => bus.Respond<Func<Type, object>, RespondStub>(It.IsAny<Func<Func<Type, object>, RespondStub>>()), Times.Once);
+            _netqRpcRabbitConnectionMock.Verify(connection => connection.Respond(It.IsAny<Func<Func<Type, object>, RespondStub>>()), Times.Once);
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             _server.RespondAsync<RequestStub, RespondStub>(AsyncCallback);
 
             //Assert
-            _busMock.Verify(bus => bus.RespondAsync<Func<Type, object>, RespondStub>(It.IsAny<Func<Func<Type, object>, Task<RespondStub>>>()), Times.Once);
+            _netqRpcRabbitConnectionMock.Verify(connection => connection.RespondAsync(It.IsAny<Func<Func<Type, object>, Task<RespondStub>>>()), Times.Once);
         }
 
         [Test]
