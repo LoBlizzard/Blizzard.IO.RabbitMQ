@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blizzard.IO.RabbitMQ\Blizzard.IO.RabbitMQ.csproj" />
+    <ProjectReference Include="..\Blizzard.IO.Serialization\Blizzard.IO.Serialization\Blizzard.IO.Serialization.csproj" />
   </ItemGroup>
 
 </Project>
