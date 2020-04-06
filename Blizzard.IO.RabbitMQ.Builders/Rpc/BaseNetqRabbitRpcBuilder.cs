@@ -34,7 +34,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
             bool publisherConfirms = false,
             bool persistentMessages = true)
         {
-            RpcConnectionKey busKey = new RpcConnectionKey(host, username, password, rpcMessageType);
+            RpcConnectionKey busKey = new RpcConnectionKey(host, username, password, rpcMessageType, serializer.GetType());
             if (netqRpcConnections.ContainsKey(busKey))
             {
                 return netqRpcConnections[busKey];
