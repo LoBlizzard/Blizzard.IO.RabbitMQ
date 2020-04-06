@@ -11,11 +11,11 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
     {
         private static Dictionary<RpcConnectionKey, INetqRabbitRpcConnection<Func<Type, object>>> netqRpcConnections = new Dictionary<RpcConnectionKey, INetqRabbitRpcConnection<Func<Type, object>>>();
 
-        private readonly ILoggerFactory _loggerFactory;
+        protected readonly ILoggerFactory LoggerFactory;
 
         public BaseNetqRabbitRpcBuilder(ILoggerFactory loggerFactory)
         {
-            _loggerFactory = loggerFactory;
+            LoggerFactory = loggerFactory;
         }
 
         protected INetqRabbitRpcConnection<Func<Type, object>> InitConnection(
@@ -40,7 +40,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
                 return netqRpcConnections[busKey];
             }
 
-            INetqRabbitRpcConnection<Func<Type,object>> connection = new NetqRabbitRpcConnection(configuration, host, username, password,_loggerFactory, serializer, requestHeartbeat, (ushort)prefetchCount, timeout,
+            INetqRabbitRpcConnection<Func<Type,object>> connection = new NetqRabbitRpcConnection(configuration, host, username, password,LoggerFactory, serializer, requestHeartbeat, (ushort)prefetchCount, timeout,
                 publisherConfirms, persistentMessages, product, platform, virtualHost);
             netqRpcConnections.Add(busKey, connection);
 
