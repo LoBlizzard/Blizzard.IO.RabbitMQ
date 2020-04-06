@@ -11,7 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SubModules", "SubModules", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.RabbitMQ.Tests", "Blizzard.IO.RabbitMQ.Tests\Blizzard.IO.RabbitMQ.Tests.csproj", "{52AAF175-8C8E-4898-8C02-F631BCFAFF24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blizzard.IO.RabbitMQ.Builders", "Blizzard.IO.RabbitMQ.Builders\Blizzard.IO.RabbitMQ.Builders.csproj", "{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.RabbitMQ.Builders", "Blizzard.IO.RabbitMQ.Builders\Blizzard.IO.RabbitMQ.Builders.csproj", "{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.Serialization", "Blizzard.IO.Serialization\Blizzard.IO.Serialization\Blizzard.IO.Serialization.csproj", "{F408B391-22FE-4B41-A2B8-9E7215301988}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,12 +37,17 @@ Global
 		{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F408B391-22FE-4B41-A2B8-9E7215301988}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F408B391-22FE-4B41-A2B8-9E7215301988}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F408B391-22FE-4B41-A2B8-9E7215301988}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F408B391-22FE-4B41-A2B8-9E7215301988}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D2111278-8B66-43F4-8C69-71BDD9AB540E} = {7BD0B07F-CFEA-4AB7-9D42-A84278157B7A}
+		{F408B391-22FE-4B41-A2B8-9E7215301988} = {7BD0B07F-CFEA-4AB7-9D42-A84278157B7A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DC37F80-E366-4FFB-A4DD-76AE02A26275}
