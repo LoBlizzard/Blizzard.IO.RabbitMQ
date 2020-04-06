@@ -6,19 +6,10 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
+using Blizzard.IO.RabbitMQ.Tests.Stubs;
 
 namespace Blizzard.IO.RabbitMQ.Tests.Rpc
 {
-    class RequestStub
-    {
-        public int Value { get; set; }
-    }
-
-    class RespondStub
-    {
-        public int Value { get; set; }
-    }
-
     [TestFixture]
     public class NetqRpcRabbitClientTests
     {
@@ -43,7 +34,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void Request_OnValidRequestAndAbstractMessageTypeBus_ShouldReturnsRespone()
+        public void Request_OnRequestAndAbstractMessageTypeBus_ShouldReturnBusRespond()
         {
             //Arrange
             RequestStub request = new RequestStub();
@@ -60,7 +51,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void Request_OnValidRequestAndConcreteMessageTypeBus_ShouldReturnsRespone()
+        public void Request_OnRequestAndConcreteMessageTypeBus_ShouldReturnBusRespond()
         {
             //Arrange
             RequestStub request = new RequestStub();
@@ -77,7 +68,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void RequestAsync_OnValidRequestAndAbstractMessageTypeBus_ShouldReturnsRespone()
+        public void RequestAsync_OnRequestAndAbstractMessageTypeBus_ShouldReturnBusRespond()
         {
             //Arrange
             RequestStub request = new RequestStub();
@@ -94,7 +85,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void RequestAsync_OnValidRequestAndConcreteMessageTypeBus_ShouldReturnsRespone()
+        public void RequestAsync_OnRequestAndConcreteMessageTypeBus_ShouldReturnBusRespond()
         {
             //Arrange
             RequestStub request = new RequestStub();
