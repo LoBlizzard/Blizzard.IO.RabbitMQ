@@ -11,9 +11,9 @@ namespace Blizzard.IO.RabbitMQ
     {
         private readonly IBus _netqBus;
         private readonly IDeserializer<TData> _deserializer;
-        private readonly IAbstractTypeDeserializer<TData> _concreteTypeDeserializer;
+        private readonly IAbstractTypeDeserializer<TData> _abstractDeserializer;
         private readonly IQueue _netqQueue;
-        private readonly IConverter<MessageProperties, RabbitMessageProperties> _converter;
+        private readonly IConverter<MessageProperties, RabbitMessageProperties> _messagePropertiesToRabbitMessagePropertiesConverter;
         private readonly ILogger _logger;
         
         private IDisposable _consumeHandler;
@@ -23,29 +23,30 @@ namespace Blizzard.IO.RabbitMQ
         public event Action<TData, RabbitMessageProperties> MessageWithMetadataReceived;
 
         protected NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, ILoggerFactory loggerFactory,
-            IConverter<MessageProperties, RabbitMessageProperties> coverter)
+            IConverter<MessageProperties, RabbitMessageProperties> messagePropertiesToRabbitMessagePropertiesConverter)
         {
             _netqBus = netqBus;
             _netqQueue = new Queue(sourceQueue.Name, sourceQueue.Exclusive);
             _logger = loggerFactory.CreateLogger(nameof(NetqRabbitConsumer<TData>));
-            _converter = coverter ?? new RabbitPropertiesConverter();
+            _messagePropertiesToRabbitMessagePropertiesConverter = messagePropertiesToRabbitMessagePropertiesConverter ?? new RabbitPropertiesConverter();
         }
 
-        public NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, IDeserializer<TData> deserializer, 
-            ILoggerFactory loggerFactory, IConverter<MessageProperties, RabbitMessageProperties> coverter = null)
-            : this(netqBus, sourceQueue, loggerFactory, coverter)
+        public NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, IDeserializer<TData> deserializer, ILoggerFactory loggerFactory,
+            IConverter<MessageProperties, RabbitMessageProperties> messagePropertiesToRabbitMessagePropertiesConverter = null)
+            : this(netqBus, sourceQueue, loggerFactory, messagePropertiesToRabbitMessagePropertiesConverter)
         {
             _deserializer = deserializer;
-            _dataExtractionStrategy += ExtractData;
+            _dataExtractionStrategy += ExtractConcreteData;
             _logger.LogDebug($"Initialized consumer from queue: {_netqQueue.Name}," +
                 $" expecting {typeof(TData)} data");
         }
 
-        public NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, IAbstractTypeDeserializer<TData> concreteTypeDeserializer,
-            ILoggerFactory loggerFactory, IConverter<MessageProperties, RabbitMessageProperties> coverter = null)
-            : this(netqBus, sourceQueue, loggerFactory, coverter)
+        public NetqRabbitConsumer(IBus netqBus, RabbitQueue sourceQueue, IAbstractTypeDeserializer<TData> abstractDeserializer,
+            ILoggerFactory loggerFactory,
+            IConverter<MessageProperties, RabbitMessageProperties> messagePropertiesToRabbitMessagePropertiesConverter = null)
+            : this(netqBus, sourceQueue, loggerFactory, messagePropertiesToRabbitMessagePropertiesConverter)
         {
-            _concreteTypeDeserializer = concreteTypeDeserializer;
+            _abstractDeserializer = abstractDeserializer;
             _dataExtractionStrategy += ExtractAbstractData;
             _logger.LogDebug($"Initialized consumer from queue: {_netqQueue.Name}," +
                 $" expecting {typeof(TData)} derieved data");
@@ -53,18 +54,25 @@ namespace Blizzard.IO.RabbitMQ
 
         public void Start()
         {
-            _consumeHandler = _netqBus.Advanced.Consume(_netqQueue, (messageBytes, messageProperties, messageIndo) =>
+            if (MessageReceived == null && MessageWithMetadataReceived == null)
             {
-                TData data = _dataExtractionStrategy.Invoke(messageBytes, messageProperties);
-                RabbitMessageProperties properties = _converter.Convert(messageProperties);
-                MessageReceived(data);
-                MessageWithMetadataReceived(data, properties);
-            });
+                _logger.LogWarning("Couldn't start consumer, must have at least one subscriber in order to start");
+            }
+            else
+            {
+                _consumeHandler = _netqBus.Advanced.Consume(_netqQueue, (messageBytes, messageProperties, messageIndo) =>
+                {
+                    TData data = _dataExtractionStrategy(messageBytes, messageProperties);
+                    RabbitMessageProperties properties = _messagePropertiesToRabbitMessagePropertiesConverter.Convert(messageProperties);
+                    MessageReceived?.Invoke(data);
+                    MessageWithMetadataReceived?.Invoke(data, properties);
+                });
 
-            _logger.LogInformation("Started consumer sucessfully");
+                _logger.LogInformation("Started consumer sucessfully");
+            }
         }
 
-        private TData ExtractData(byte[] messageBytes, MessageProperties messageProperties)
+        private TData ExtractConcreteData(byte[] messageBytes, MessageProperties messageProperties)
         {
             return _deserializer.Deserialize(messageBytes);
         }
@@ -72,7 +80,7 @@ namespace Blizzard.IO.RabbitMQ
         private TData ExtractAbstractData(byte[] messageBytes, MessageProperties messageProperties)
         {
             Type messageConcreteType = Type.GetType(messageProperties.Type);
-            return _concreteTypeDeserializer.Deserialize(messageBytes, messageConcreteType);
+            return _abstractDeserializer.Deserialize(messageBytes, messageConcreteType);
         }
 
         public void Stop()
