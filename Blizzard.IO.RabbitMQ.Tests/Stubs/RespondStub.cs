@@ -2,5 +2,6 @@
 {
     internal class RespondStub
     {
+        public int Value { get; set; }
     }
 }
