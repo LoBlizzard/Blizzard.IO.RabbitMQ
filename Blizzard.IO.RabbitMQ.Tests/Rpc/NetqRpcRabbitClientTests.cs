@@ -36,11 +36,14 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             _busMock = new Mock<IBus>();
             _netqRpcRabbitConnectionMock.Setup(connection => connection.Bus).Returns(_busMock.Object);
 
-            _rpcClient = new NetqRabbitRpcClient(_netqRpcRabbitConnectionMock.Object, _logger.Object);
+            Mock<ILoggerFactory> lfMock = new Mock<ILoggerFactory>();
+            lfMock.Setup(lf => lf.CreateLogger(It.IsAny<string>())).Returns(_logger.Object);
+
+            _rpcClient = new NetqRabbitRpcClient(_netqRpcRabbitConnectionMock.Object, lfMock.Object);
         }
 
         [Test]
-        public void Request_OnValidRequestAndAbstractMessageTypeBus_ShouldReturnValidRespone()
+        public void Request_OnValidRequestAndAbstractMessageTypeBus_ShouldReturnsRespone()
         {
             //Arrange
             RequestStub request = new RequestStub();
@@ -57,12 +60,12 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void Request_OnValidRequestAndConcreteMessageTypeBus_ShouldReturnValidRespone()
+        public void Request_OnValidRequestAndConcreteMessageTypeBus_ShouldReturnsRespone()
         {
             //Arrange
             RequestStub request = new RequestStub();
             RespondStub expectedRespond = new RespondStub { Value = 6 };
-            _busMock.Setup(bus => bus.Request<RequestStub, Func<Type, object>>(It.IsAny<RequestStub>())).Returns(type => expectedRespond);
+            _netqRpcRabbitConnectionMock.Setup(connection => connection.Request(It.IsAny<RequestStub>())).Returns(type => expectedRespond);
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Concrete);
 
             //Act
@@ -70,11 +73,11 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
 
             //Assert
             Assert.AreEqual(expectedRespond, actualRespond);
-            _busMock.Verify(bus => bus.Request<RequestStub, Func<Type, object>>(request), Times.Once);
+            _netqRpcRabbitConnectionMock.Verify(connection => connection.Request(request), Times.Once);
         }
 
         [Test]
-        public void RequestAsync_OnValidRequestAndAbstractMessageTypeBus_ShouldReturnValidRespone()
+        public void RequestAsync_OnValidRequestAndAbstractMessageTypeBus_ShouldReturnsRespone()
         {
             //Arrange
             RequestStub request = new RequestStub();
@@ -91,12 +94,12 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         }
 
         [Test]
-        public void RequestAsync_OnValidRequestAndConcreteMessageTypeBus_ShouldReturnValidRespone()
+        public void RequestAsync_OnValidRequestAndConcreteMessageTypeBus_ShouldReturnsRespone()
         {
             //Arrange
             RequestStub request = new RequestStub();
             RespondStub expectedRespond = new RespondStub { Value = 6 };
-            _busMock.Setup(bus => bus.RequestAsync<RequestStub, Func<Type, object>>(It.IsAny<RequestStub>())).Returns(Task.Factory.StartNew(()=> new Func<Type,object>(type => expectedRespond)));
+            _netqRpcRabbitConnectionMock.Setup(connection => connection.RequestAsync(It.IsAny<RequestStub>())).Returns(Task.Factory.StartNew(()=> new Func<Type,object>(type => expectedRespond)));
             _netqRpcRabbitConnectionMock.Setup(connection => connection.RpcMessageType).Returns(RpcMessageType.Concrete);
 
             //Act
@@ -104,7 +107,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
 
             //Assert
             Assert.AreEqual(expectedRespond, actualRespond);
-            _busMock.Verify(bus => bus.RequestAsync<RequestStub, Func<Type, object>>(request), Times.Once);
+            _netqRpcRabbitConnectionMock.Verify(connection => connection.RequestAsync(request), Times.Once);
         }
 
         [Test]

@@ -11,9 +11,9 @@ namespace Blizzard.IO.RabbitMQ.Rpc
         private readonly INetqRabbitRpcConnection<Func<Type, object>> _netqRpcRabbitConnection;
         private readonly ILogger _logger;
 
-        public NetqRabbitRpcClient(INetqRabbitRpcConnection<Func<Type, object>> netqRpcRabbitConnection, ILogger logger)
+        public NetqRabbitRpcClient(INetqRabbitRpcConnection<Func<Type, object>> netqRpcRabbitConnection, ILoggerFactory loggerFactory)
         {
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger(nameof(NetqRabbitRpcClient));
             _netqRpcRabbitConnection = netqRpcRabbitConnection;
         }
 
@@ -21,15 +21,15 @@ namespace Blizzard.IO.RabbitMQ.Rpc
         where TRequest : class
         where TRespond : class
         {
+            _logger.LogDebug($"Requesting an {_netqRpcRabbitConnection.RpcMessageType} message type request of type: {typeof(TRequest)} and expecting to receive a respond of type: {typeof(TRespond)}");
+
             if (_netqRpcRabbitConnection.RpcMessageType == RpcMessageType.Abstract)
             {
-                _logger.LogDebug($"Requesting an abstract type request of type: {typeof(TRequest)} and expecting to receive a respond of type: {typeof(TRespond)}");
                 return _netqRpcRabbitConnection.Bus.Request<TRequest, TRespond>(request);
             }
             else if (_netqRpcRabbitConnection.RpcMessageType == RpcMessageType.Concrete)
             {
-                _logger.LogDebug($"Requesting a concrete type request of type: {typeof(TRequest)} and expecting to receive a respond of type: {typeof(TRespond)}");
-                var func = _netqRpcRabbitConnection.Bus.Request<TRequest, Func<Type, object>>(request);
+                Func<Type, object> func = _netqRpcRabbitConnection.Request(request);
                 return (TRespond)func(typeof(TRespond));
             }
 
@@ -41,15 +41,15 @@ namespace Blizzard.IO.RabbitMQ.Rpc
         where TRequest : class
         where TRespond : class
         {
+            _logger.LogDebug($"Requesting an {_netqRpcRabbitConnection.RpcMessageType} message type async request of type: {typeof(TRequest)} and expecting to receive a respond of type: {typeof(TRespond)}");
+
             if (_netqRpcRabbitConnection.RpcMessageType == RpcMessageType.Abstract)
             {
-                _logger.LogDebug($"Requesting an abstract type async request of type: {typeof(TRequest)} and expecting to receive a respond of type: {typeof(TRespond)}");
                 return await _netqRpcRabbitConnection.Bus.RequestAsync<TRequest, TRespond>(request);
             }
             else if (_netqRpcRabbitConnection.RpcMessageType == RpcMessageType.Concrete)
             {
-                _logger.LogDebug($"Requesting a concrete type async request of type: {typeof(TRequest)} and expecting to receive a respond of type: {typeof(TRespond)}");
-                Func<Type, object> func = await _netqRpcRabbitConnection.Bus.RequestAsync<TRequest, Func<Type, object>>(request);
+                Func<Type, object> func = await _netqRpcRabbitConnection.RequestAsync(request);
                 return (TRespond)func(typeof(TRespond));
             }
 
