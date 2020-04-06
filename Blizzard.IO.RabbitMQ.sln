@@ -13,7 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.RabbitMQ.Tests"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.RabbitMQ.Builders", "Blizzard.IO.RabbitMQ.Builders\Blizzard.IO.RabbitMQ.Builders.csproj", "{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.Serialization", "Blizzard.IO.Serialization\Blizzard.IO.Serialization\Blizzard.IO.Serialization.csproj", "{F408B391-22FE-4B41-A2B8-9E7215301988}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SubModules", "SubModules", "{6A64A172-0864-46D1-9583-C8035E5ECC72}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.Core", "Blizzard.IO.Serialization\Blizzard.IO.Core\Blizzard.IO.Core\Blizzard.IO.Core.csproj", "{AF0EFCD1-9365-4792-A83D-D2A2AF54F7D7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blizzard.IO.Serialization", "Blizzard.IO.Serialization\Blizzard.IO.Serialization\Blizzard.IO.Serialization.csproj", "{3DEE6699-439C-416A-B89C-EDA329C1C1CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,17 +41,23 @@ Global
 		{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA6F1347-3CF3-4863-BDE1-4AA0B7BE4016}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F408B391-22FE-4B41-A2B8-9E7215301988}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F408B391-22FE-4B41-A2B8-9E7215301988}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F408B391-22FE-4B41-A2B8-9E7215301988}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F408B391-22FE-4B41-A2B8-9E7215301988}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF0EFCD1-9365-4792-A83D-D2A2AF54F7D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF0EFCD1-9365-4792-A83D-D2A2AF54F7D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF0EFCD1-9365-4792-A83D-D2A2AF54F7D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF0EFCD1-9365-4792-A83D-D2A2AF54F7D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DEE6699-439C-416A-B89C-EDA329C1C1CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DEE6699-439C-416A-B89C-EDA329C1C1CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DEE6699-439C-416A-B89C-EDA329C1C1CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DEE6699-439C-416A-B89C-EDA329C1C1CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D2111278-8B66-43F4-8C69-71BDD9AB540E} = {7BD0B07F-CFEA-4AB7-9D42-A84278157B7A}
-		{F408B391-22FE-4B41-A2B8-9E7215301988} = {7BD0B07F-CFEA-4AB7-9D42-A84278157B7A}
+		{6A64A172-0864-46D1-9583-C8035E5ECC72} = {7BD0B07F-CFEA-4AB7-9D42-A84278157B7A}
+		{AF0EFCD1-9365-4792-A83D-D2A2AF54F7D7} = {6A64A172-0864-46D1-9583-C8035E5ECC72}
+		{3DEE6699-439C-416A-B89C-EDA329C1C1CC} = {7BD0B07F-CFEA-4AB7-9D42-A84278157B7A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DC37F80-E366-4FFB-A4DD-76AE02A26275}
