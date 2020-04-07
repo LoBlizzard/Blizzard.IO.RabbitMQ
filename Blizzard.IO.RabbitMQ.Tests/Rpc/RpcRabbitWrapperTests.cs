@@ -44,22 +44,35 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         private Mock<ITimeoutStrategy> _timeoutStrategyMock;
         private Mock<ITypeNameSerializer> _typenameSerializerMock;
 
-        private bool _calledExchangeNameProvider = false;
+        private bool _calledRequestExchangeNameProvider = false;
         private bool _calledRoutingKeyProvider = false;
+        private bool _calledResponseExchangeNameProvider = false;
+        private bool _calledReturnQueueNameProvider = false;
 
         [SetUp]
         public void Setup()
         {
             _rpcConfiguration = new RpcConfiguration
             {
-                ExchangeNameProvider = type => {
-                    _calledExchangeNameProvider = true;
+                RequestExchangeNameProvider = type => 
+                {
+                    _calledRequestExchangeNameProvider = true;
                     return "test1";
                 },
                 RoutingKeyProvider = type =>
                 {
                     _calledRoutingKeyProvider = true;
                     return "test2";
+                },
+                ResponseExchangeNameProvider= type =>
+                {
+                    _calledResponseExchangeNameProvider = true;
+                    return "test3";
+                },
+                ReturnQueueNameProvider = () =>
+                {
+                    _calledReturnQueueNameProvider= true;
+                    return "test4";
                 }
             };
 
@@ -81,8 +94,6 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         public void Ctor_OnRpcWrapperUsage_ShouldUseRpcConfigurationToGenerateExchangesAndQueuesInsteadOfTheDefaultNetqWay()
         {
             //Arrange
-            _conventionsStub.RpcReturnQueueNamingConvention = () => "a";
-            _conventionsStub.RpcResponseExchangeNamingConvention = type => "b";
             _advancedBusMock.Setup(bus => bus.Consume<object>(It.IsAny<IQueue>(), It.IsAny<Func<IMessage<object>,MessageReceivedInfo,Task>>()))
                 .Returns(new CancelationMock());
             _advancedBusMock.Setup(bus => bus.QueueDeclare(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>(), 
@@ -100,8 +111,10 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
             var task = _rpcRabbitWrapper.Request<object, object>(new object(), x=> { });
 
             //Assert
-            Assert.True(_calledExchangeNameProvider);
+            Assert.True(_calledRequestExchangeNameProvider);
             Assert.True(_calledRoutingKeyProvider);
+            Assert.True(_calledResponseExchangeNameProvider);
+            Assert.True(_calledReturnQueueNameProvider);
         }
     }
 }
