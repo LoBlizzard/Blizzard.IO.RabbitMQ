@@ -39,9 +39,16 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
             return this;
         }
 
-        public NetqRabbitRpcBuilder AddCredentials(string hostname, string username, string password)
+        public NetqRabbitRpcBuilder AddHostnameAndCredentials(string hostname, string username, string password)
         {
             Hostname = hostname;
+            Username = username;
+            Password = password;
+            return this;
+        }
+
+        public NetqRabbitRpcBuilder AddCredentials(string username, string password)
+        {
             Username = username;
             Password = password;
             return this;
