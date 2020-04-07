@@ -1,8 +1,6 @@
 ﻿using Blizzard.IO.Core;
 using Blizzard.IO.RabbitMQ.Entities;
 using EasyNetQ;
-using System;
-using System.Collections.Generic;
 
 namespace Blizzard.IO.RabbitMQ
 {
@@ -12,23 +10,84 @@ namespace Blizzard.IO.RabbitMQ
     {
         public MessageProperties Convert(RabbitMessageProperties rabbitMessageProperties)
         {
-            return new MessageProperties
+            var messageProperties = new MessageProperties();
+
+            if (rabbitMessageProperties.DeliveryMode != null)
             {
-                DeliveryMode = rabbitMessageProperties.DeliveryMode,
-                Type = rabbitMessageProperties.Type,
-                Headers = rabbitMessageProperties.Headers,
-                ContentType = rabbitMessageProperties.ContentType,
-                ContentEncoding = rabbitMessageProperties.ContentEncoding,
-                MessageId = rabbitMessageProperties.MessageId,
-                CorrelationId = rabbitMessageProperties.CorrelationId,
-                ReplyTo = rabbitMessageProperties.ReplyTo,
-                Timestamp = rabbitMessageProperties.Timestamp,
-                UserId = rabbitMessageProperties.UserId,
-                AppId = rabbitMessageProperties.AppId,
-                ClusterId = rabbitMessageProperties.ClusterId,
-                Expiration = rabbitMessageProperties.Expiration,
-                Priority = rabbitMessageProperties.Priority
-            };
+                messageProperties.DeliveryMode = (byte) rabbitMessageProperties.DeliveryMode;
+            }
+
+            if (rabbitMessageProperties.Type != null)
+            {
+                messageProperties.Type = rabbitMessageProperties.Type;
+            }
+
+            if (rabbitMessageProperties.Headers != null)
+            {
+                messageProperties.Headers = rabbitMessageProperties.Headers;
+            }
+            else
+            {
+                // By default the headersPresent is set to true
+                messageProperties.HeadersPresent = false;
+            }
+
+            if (rabbitMessageProperties.ContentType != null)
+            {
+                messageProperties.ContentType = rabbitMessageProperties.ContentType;
+            }
+
+            if (rabbitMessageProperties.ContentEncoding != null)
+            {
+                messageProperties.ContentEncoding = rabbitMessageProperties.ContentEncoding;
+            }
+
+            if (rabbitMessageProperties.MessageId != null)
+            {
+                messageProperties.MessageId = rabbitMessageProperties.MessageId;
+            }
+
+            if (rabbitMessageProperties.CorrelationId != null)
+            {
+                messageProperties.CorrelationId = rabbitMessageProperties.CorrelationId;
+            }
+
+            if (rabbitMessageProperties.ReplyTo != null)
+            {
+                messageProperties.ReplyTo = rabbitMessageProperties.ReplyTo;
+            }
+
+            if (rabbitMessageProperties.Timestamp != null)
+            {
+                messageProperties.Timestamp = (long) rabbitMessageProperties.Timestamp;
+            }
+
+            if (rabbitMessageProperties.UserId != null)
+            {
+                messageProperties.UserId = rabbitMessageProperties.UserId;
+            }
+
+            if (rabbitMessageProperties.AppId != null)
+            {
+                messageProperties.AppId = rabbitMessageProperties.AppId;
+            }
+
+            if (rabbitMessageProperties.ClusterId != null)
+            {
+                messageProperties.ClusterId = rabbitMessageProperties.ClusterId;
+            }
+
+            if (rabbitMessageProperties.Expiration != null)
+            {
+                messageProperties.Expiration = rabbitMessageProperties.Expiration;
+            }
+
+            if (rabbitMessageProperties.Priority != null)
+            {
+                messageProperties.Priority = (byte) rabbitMessageProperties.Priority;
+            }
+
+            return messageProperties;
         }
 
         public RabbitMessageProperties Convert(MessageProperties messageProperties)
