@@ -95,13 +95,13 @@ namespace Blizzard.IO.RabbitMQ.Builders
         public NetqRabbitConsumer<TData> Build()
         {
             IBus bus = InitConnection();
-            _sourceQueue = _sourceQueue ?? bus.DeclareQueue("DefaultQueue");
+            RabbitQueue sourceQueue = _sourceQueue ?? bus.DeclareQueue("DefaultQueue");
             if (_isAbstract)
             {
-                return new NetqRabbitConsumer<TData>(bus, _sourceQueue, _abstractDeserializer, LoggerFactory, _converter);
+                return new NetqRabbitConsumer<TData>(bus, sourceQueue, _abstractDeserializer, LoggerFactory, _converter);
             }
 
-            return new NetqRabbitConsumer<TData>(bus, _sourceQueue, _deserializer, LoggerFactory, _converter);
+            return new NetqRabbitConsumer<TData>(bus, sourceQueue, _deserializer, LoggerFactory, _converter);
         }
     }
 }
