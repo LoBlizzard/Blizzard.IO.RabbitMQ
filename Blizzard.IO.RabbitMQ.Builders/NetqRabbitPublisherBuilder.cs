@@ -14,7 +14,6 @@ namespace Blizzard.IO.RabbitMQ.Builders
         private string _routingKey = "/";
         private bool _isAbstract;
         private IConverter<RabbitMessageProperties, MessageProperties> _converter;
-        private ILoggerFactory _loggerFactory;
 
         public NetqRabbitPublisherBuilder(ILoggerFactory loggerFactory) : base(loggerFactory)
         {
@@ -93,12 +92,6 @@ namespace Blizzard.IO.RabbitMQ.Builders
             return this;
         }
 
-        public NetqRabbitPublisherBuilder<TData> AddLoggerFactory(ILoggerFactory loggerFactory)
-        {
-            _loggerFactory = loggerFactory;
-            return this;
-        }
-
         public NetqRabbitPublisherBuilder<TData> AddConverter(
             IConverter<RabbitMessageProperties, MessageProperties> converter)
         {
@@ -106,7 +99,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
             return this;
         }
 
-        public NetqRabbitPublisher<TData> BuildPublisher()
+        public NetqRabbitPublisher<TData> Build()
         {
             IBus bus = InitConnection();
 
@@ -115,7 +108,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
                 _destinationExchange = bus.DeclareExchange("DefaultExchange", RabbitExchangeType.Fanout);
             }
 
-            return new NetqRabbitPublisher<TData>(bus, _serializer, _destinationExchange, _loggerFactory, _converter,
+            return new NetqRabbitPublisher<TData>(bus, _serializer, _destinationExchange, LoggerFactory, _converter,
                 _isAbstract, _routingKey);
         }
     }
