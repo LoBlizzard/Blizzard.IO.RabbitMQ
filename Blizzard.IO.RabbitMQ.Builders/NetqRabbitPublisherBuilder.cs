@@ -39,13 +39,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
             PersistentMessages = persistentMessages;
             return this;
         }
-
-        public NetqRabbitPublisherBuilder<TData> AddHost(string host)
-        {
-            Hostname = host;
-            return this;
-        }
-
+        
         public NetqRabbitPublisherBuilder<TData> AddCredentials(string username, string password)
         {
             Username = username;
@@ -55,7 +49,8 @@ namespace Blizzard.IO.RabbitMQ.Builders
 
         public NetqRabbitPublisherBuilder<TData> AddHostAndCredentials(string host, string username, string password)
         {
-            return AddHost(host).AddCredentials(username, password);
+            Hostname = host;
+            return AddCredentials(username, password);
         }
 
         public NetqRabbitPublisherBuilder<TData> AddSerializer(ISerializer<TData> serializer)
