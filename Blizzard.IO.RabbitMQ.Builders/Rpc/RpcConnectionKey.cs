@@ -3,7 +3,7 @@ using System;
 
 namespace Blizzard.IO.RabbitMQ.Builders.Rpc
 {
-    public struct RpcConnectionKey
+    public struct RpcConnectionId
     {
         public string Hostname { get; }
         public string Username { get; }
@@ -11,7 +11,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
         public RpcMessageType RpcMessageType { get; }
         public Type SerializerType { get; }
 
-        public RpcConnectionKey(string hostname, string username, string password, RpcMessageType rpcMessageType, Type serializerType)
+        public RpcConnectionId(string hostname, string username, string password, RpcMessageType rpcMessageType, Type serializerType)
         {
             Hostname = hostname;
             Username = username;
