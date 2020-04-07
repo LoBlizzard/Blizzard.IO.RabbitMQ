@@ -1,12 +1,12 @@
 ﻿namespace Blizzard.IO.RabbitMQ.Builders
 {
-    internal struct ConnectionKey
+    internal struct ConnectionId
     {
         public string Hostname { get; }
         public string Username { get; }
         public string Password { get; }
 
-        public ConnectionKey(string hostname, string username, string password)
+        public ConnectionId(string hostname, string username, string password)
         {
             Hostname = hostname;
             Username = username;

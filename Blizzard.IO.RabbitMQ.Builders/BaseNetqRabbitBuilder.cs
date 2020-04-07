@@ -7,7 +7,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
 {
     public abstract class BaseNetqRabbitBuilder
     {
-        private static Dictionary<ConnectionKey, IBus> netqRabbitConnections = new Dictionary<ConnectionKey, IBus>();
+        private static Dictionary<ConnectionId, IBus> netqRabbitConnections = new Dictionary<ConnectionId, IBus>();
 
         protected string Hostname = "localhost";
         protected string Password = "guest";
@@ -29,7 +29,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
 
         protected IBus InitConnection()
         {
-            var busKey = new ConnectionKey(Hostname,Username, Password);
+            var busKey = new ConnectionId(Hostname,Username, Password);
             if (netqRabbitConnections.ContainsKey(busKey))
             {
                 return netqRabbitConnections[busKey];
