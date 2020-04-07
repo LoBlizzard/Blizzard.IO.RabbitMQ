@@ -1,5 +1,6 @@
 ﻿using Blizzard.IO.Core;
 using Blizzard.IO.RabbitMQ.Entities;
+using Blizzard.IO.RabbitMQ.Extensions;
 using Blizzard.IO.Serialization.Json;
 using EasyNetQ;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
 {
     public class NetqRabbitPublisherBuilder<TData> : BaseNetqRabbitBuilder
     {
-        private RabbitExchange _destinationExchange = new RabbitExchange(){Name = "DefaultExchange"};
+        private RabbitExchange _destinationExchange = null;
         private ISerializer<TData> _serializer = new JsonSerializer<TData>();
         private string _routingKey = "/";
         private bool _isAbstract;
@@ -70,9 +71,19 @@ namespace Blizzard.IO.RabbitMQ.Builders
             return this;
         }
 
-        public NetqRabbitPublisherBuilder<TData> AddDestinationExchange(RabbitExchange destinationExchange)
+        public NetqRabbitPublisherBuilder<TData> AddDestinationExchange(string name, RabbitExchangeType type)
         {
-            _destinationExchange = destinationExchange;
+            _destinationExchange = new RabbitExchange()
+            {
+                Name = name, 
+                Type = type
+            };
+            return this;
+        }
+
+        public NetqRabbitPublisherBuilder<TData> AddDestinationExchange(RabbitExchange exchange)
+        {
+            _destinationExchange = exchange;
             return this;
         }
 
@@ -98,6 +109,12 @@ namespace Blizzard.IO.RabbitMQ.Builders
         public NetqRabbitPublisher<TData> BuildPublisher()
         {
             IBus bus = InitConnection();
+
+            if (_destinationExchange == null)
+            {
+                _destinationExchange = bus.DeclareExchange("DefaultExchange", RabbitExchangeType.Fanout);
+            }
+
             return new NetqRabbitPublisher<TData>(bus, _serializer, _destinationExchange, _loggerFactory, _converter,
                 _isAbstract, _routingKey);
         }
