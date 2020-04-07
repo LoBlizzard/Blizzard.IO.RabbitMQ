@@ -65,6 +65,12 @@ namespace Blizzard.IO.RabbitMQ.Builders
             return this;
         }
 
+        public NetqRabbitPublisherBuilder<TData> RemoveAbstractSupport()
+        {
+            _isAbstract = false;
+            return this;
+        }
+
         public NetqRabbitPublisherBuilder<TData> AddDestinationExchange(string name, RabbitExchangeType type)
         {
             _destinationExchange = new RabbitExchange()
