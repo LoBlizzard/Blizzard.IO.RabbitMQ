@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using EasyNetQ;
 using Blizzard.IO.RabbitMQ.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Blizzard.IO.RabbitMQ.Builders
 {
@@ -8,27 +9,34 @@ namespace Blizzard.IO.RabbitMQ.Builders
     {
         private static Dictionary<ConnectionKey, IBus> netqRabbitConnections = new Dictionary<ConnectionKey, IBus>();
 
-        protected IBus InitConnection(
-            string host,
-            string password,
-            string username,
-            ushort timeout = 10,
-            string product = "",
-            string platform = "",
-            string virtualHost = "/",
-            int requestHeartbeat = 10,
-            int prefetchCount = 50,
-            bool publisherConfirms = false,
-            bool persistentMessages = true)
+        protected string Hostname = "localhost";
+        protected string Password = "guest";
+        protected string Username = "guest";
+        protected ushort Timeout = 10;
+        protected string Product = "";
+        protected string Platform = "";
+        protected string VirtualHost = "/";
+        protected int RequestHeartbeat = 10;
+        protected int PrefetchCount = 50;
+        protected bool PublisherConfirms = false;
+        protected bool PersistentMessages = true;
+        protected readonly ILoggerFactory LoggerFactory;
+
+        protected BaseNetqRabbitBuilder(ILoggerFactory loggerFactory)
         {
-            ConnectionKey busKey = new ConnectionKey(host, username, password);
+            LoggerFactory = loggerFactory;
+        }
+
+        protected IBus InitConnection()
+        {
+            var busKey = new ConnectionKey(Hostname,Username, Password);
             if (netqRabbitConnections.ContainsKey(busKey))
             {
                 return netqRabbitConnections[busKey];
             }
 
-            IBus bus = BusExtensions.CreateBus(host, username, password, timeout, product, platform, virtualHost, 
-                requestHeartbeat, prefetchCount, publisherConfirms, persistentMessages);
+            IBus bus = BusExtensions.CreateBus(Hostname, Username, Password, Timeout, Product, Platform, VirtualHost, 
+                RequestHeartbeat, PrefetchCount, PublisherConfirms, PersistentMessages);
             netqRabbitConnections.Add(busKey, bus);
 
             return bus;
