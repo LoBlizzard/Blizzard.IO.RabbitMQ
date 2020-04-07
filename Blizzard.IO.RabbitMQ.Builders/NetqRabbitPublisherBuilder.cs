@@ -1,5 +1,6 @@
 ﻿using Blizzard.IO.Core;
 using Blizzard.IO.RabbitMQ.Entities;
+using Blizzard.IO.Serialization.Json;
 using EasyNetQ;
 using Microsoft.Extensions.Logging;
 
@@ -7,12 +8,55 @@ namespace Blizzard.IO.RabbitMQ.Builders
 {
     public class NetqRabbitPublisherBuilder<TData> : BaseNetqRabbitBuilder
     {
-        private RabbitExchange _destinationExchange = null;
-        private bool _isAbstract = false;
-        private ISerializer<TData> _serializer = null;
+        private RabbitExchange _destinationExchange = new RabbitExchange(){Name = "DefaultExchange"};
+        private ISerializer<TData> _serializer = new JsonSerializer<TData>();
         private string _routingKey = "/";
-        private IConverter<RabbitMessageProperties, MessageProperties> _converter = null;
-        private ILoggerFactory _loggerFactory = null;
+        private bool _isAbstract;
+        private IConverter<RabbitMessageProperties, MessageProperties> _converter;
+        private ILoggerFactory _loggerFactory;
+
+        public NetqRabbitPublisherBuilder(ILoggerFactory loggerFactory) : base(loggerFactory)
+        {
+        }
+
+        public NetqRabbitPublisherBuilder<TData> AddRabbitConnectionProperties(
+            ushort timeout = 10,
+            string product = null,
+            string platform = null,
+            string virtualHost = null,
+            int requestHeartbeat = 10,
+            int prefetchCount = 50,
+            bool publisherConfirms = false,
+            bool persistentMessages = true)
+        {
+            Timeout = timeout;
+            PrefetchCount = prefetchCount;
+            Product = product;
+            Platform = platform;
+            PublisherConfirms = publisherConfirms;
+            RequestHeartbeat = requestHeartbeat;
+            VirtualHost = virtualHost;
+            PersistentMessages = persistentMessages;
+            return this;
+        }
+
+        public NetqRabbitPublisherBuilder<TData> AddHost(string host)
+        {
+            Hostname = host;
+            return this;
+        }
+
+        public NetqRabbitPublisherBuilder<TData> AddCredentials(string username, string password)
+        {
+            Username = username;
+            Password = password;
+            return this;
+        }
+
+        public NetqRabbitPublisherBuilder<TData> AddHostAndCredentials(string host, string username, string password)
+        {
+            return AddHost(host).AddCredentials(username, password);
+        }
 
         public NetqRabbitPublisherBuilder<TData> AddSerializer(ISerializer<TData> serializer)
         {
@@ -57,6 +101,5 @@ namespace Blizzard.IO.RabbitMQ.Builders
             return new NetqRabbitPublisher<TData>(bus, _serializer, _destinationExchange, _loggerFactory, _converter,
                 _isAbstract, _routingKey);
         }
-
     }
 }
