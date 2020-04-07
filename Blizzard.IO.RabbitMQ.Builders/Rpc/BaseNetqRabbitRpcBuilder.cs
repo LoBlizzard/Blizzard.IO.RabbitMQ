@@ -10,7 +10,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
 {
     public class BaseNetqRabbitRpcBuilder
     {
-        private static Dictionary<RpcConnectionKey, INetqRabbitRpcConnection<Func<Type, object>>> netqRpcConnections = new Dictionary<RpcConnectionKey, INetqRabbitRpcConnection<Func<Type, object>>>();
+        private static Dictionary<RpcConnectionKey, INetqRabbitRpcConnection> netqRpcConnections = new Dictionary<RpcConnectionKey, INetqRabbitRpcConnection>();
 
         protected ISerializer Serializer = new JsonSerializer();
         protected string Hostname = "localhost";
@@ -37,7 +37,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
             LoggerFactory = loggerFactory;
         }
 
-        protected INetqRabbitRpcConnection<Func<Type, object>> InitConnection()
+        protected INetqRabbitRpcConnection InitConnection()
         {
             RpcConnectionKey busKey = new RpcConnectionKey(Hostname, Username, Password, RpcMessageType, Serializer.GetType());
             if (netqRpcConnections.ContainsKey(busKey))
@@ -45,7 +45,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
                 return netqRpcConnections[busKey];
             }
 
-            INetqRabbitRpcConnection<Func<Type,object>> connection = new NetqRabbitRpcConnection(RpcConfiguration, Hostname, Username, Password,LoggerFactory,
+            INetqRabbitRpcConnection connection = new NetqRabbitRpcConnection(RpcConfiguration, Hostname, Username, Password,LoggerFactory,
                Serializer, RequestHeartbeat, (ushort)PrefetchCount,Timeout,PublisherConfirms, PersistentMessages, Product, Platform, VirtualHost);
             netqRpcConnections.Add(busKey, connection);
 

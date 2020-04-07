@@ -61,14 +61,14 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
 
         public IRpcClient BuildClient()
         {
-            INetqRabbitRpcConnection<Func<Type, object>> connection = InitConnection();
+            INetqRabbitRpcConnection connection = InitConnection();
 
             return new NetqRabbitRpcClient(connection, LoggerFactory);
         }
 
         public IRpcServer BuildServer()
         {
-            INetqRabbitRpcConnection<Func<Type, object>> connection = InitConnection();
+            INetqRabbitRpcConnection connection = InitConnection();
 
             return new NetqRabbitRpcServer(connection, LoggerFactory);
         }
