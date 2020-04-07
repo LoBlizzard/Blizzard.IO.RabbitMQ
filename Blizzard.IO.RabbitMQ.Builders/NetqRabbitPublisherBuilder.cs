@@ -12,7 +12,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
         private RabbitExchange _destinationExchange = null;
         private ISerializer<TData> _serializer = new JsonSerializer<TData>();
         private string _routingKey = "/";
-        private bool _isAbstract;
+        private bool _isAbstract = false;
         private IConverter<RabbitMessageProperties, MessageProperties> _converter;
 
         public NetqRabbitPublisherBuilder(ILoggerFactory loggerFactory) : base(loggerFactory)
