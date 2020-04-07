@@ -12,7 +12,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
 {
     public class NetqRabbitRpcServerTests
     {
-        private Mock<INetqRabbitRpcConnection<Func<Type, object>>> _netqRpcRabbitConnectionMock;
+        private Mock<INetqRabbitRpcConnection> _netqRpcRabbitConnectionMock;
         private Mock<IBus> _busMock;
         
         private NetqRabbitRpcServer _server;
@@ -21,7 +21,7 @@ namespace Blizzard.IO.RabbitMQ.Tests.Rpc
         public void Setup()
         {
             _busMock = new Mock<IBus>();
-            _netqRpcRabbitConnectionMock = new Mock<INetqRabbitRpcConnection<Func<Type, object>>>();
+            _netqRpcRabbitConnectionMock = new Mock<INetqRabbitRpcConnection>();
 
             _netqRpcRabbitConnectionMock.Setup(connection => connection.Bus).Returns(_busMock.Object);
 

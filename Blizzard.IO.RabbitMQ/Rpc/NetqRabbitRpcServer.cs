@@ -8,12 +8,12 @@ namespace Blizzard.IO.RabbitMQ.Rpc
 {
     public class NetqRabbitRpcServer : IRpcServer
     {
-        private readonly INetqRabbitRpcConnection<Func<Type,object>> _netqRabbitRpcConnection;
+        private readonly INetqRabbitRpcConnection _netqRabbitRpcConnection;
         private IDisposable _respondHandler;
         private bool _isStarted;
         private readonly ILogger _logger;
 
-        public NetqRabbitRpcServer(INetqRabbitRpcConnection<Func<Type,object>> netqRpcRabbitConnection, ILoggerFactory loggerFactory)
+        public NetqRabbitRpcServer(INetqRabbitRpcConnection netqRpcRabbitConnection, ILoggerFactory loggerFactory)
         {
             _netqRabbitRpcConnection = netqRpcRabbitConnection;
             _respondHandler = null;

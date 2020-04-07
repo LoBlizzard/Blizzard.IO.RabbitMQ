@@ -5,19 +5,18 @@ using System.Threading.Tasks;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public interface INetqRabbitRpcConnection<T>
-        where T : class
+    public interface INetqRabbitRpcConnection
     {
         IBus Bus { get; }
         RpcMessageType RpcMessageType { get; }
 
-        T Request<TRequest>(TRequest request)
+        Func<Type,object> Request<TRequest>(TRequest request)
             where TRequest : class;
-        Task<T> RequestAsync<TRequest>(TRequest request)
+        Task<Func<Type, object>> RequestAsync<TRequest>(TRequest request)
             where TRequest : class;
-        IDisposable Respond<TRespond>(Func<T, TRespond> callback)
+        IDisposable Respond<TRespond>(Func<Func<Type, object>, TRespond> callback)
             where TRespond : class;
-        IDisposable RespondAsync<TRespond>(Func<T, Task<TRespond>> callback)
+        IDisposable RespondAsync<TRespond>(Func<Func<Type, object>, Task<TRespond>> callback)
             where TRespond : class;
     }
 }
