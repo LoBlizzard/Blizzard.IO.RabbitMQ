@@ -3,12 +3,14 @@ using Blizzard.IO.RabbitMQ.Entities;
 using Blizzard.IO.RabbitMQ.Extensions;
 using Blizzard.IO.Serialization.Json;
 using EasyNetQ;
+using EasyNetQ.Topology;
 using Microsoft.Extensions.Logging;
 
 namespace Blizzard.IO.RabbitMQ.Builders
 {
     public class NetqRabbitConsumerBuilder<TData> : BaseNetqRabbitBuilder
     {
+        private const string DEFAULT_SOURCE_QUEUE_NAME = "DEFAULT_QUEUE";
         private RabbitQueue _sourceQueue;
         private IDeserializer<TData> _deserializer = new JsonSerializer<TData>();
         private IAbstractTypeDeserializer<TData> _abstractDeserializer = new JsonAbstractTypeDeserializer<TData>();
@@ -95,7 +97,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
         public NetqRabbitConsumer<TData> Build()
         {
             IBus bus = InitConnection();
-            RabbitQueue sourceQueue = _sourceQueue ?? bus.DeclareQueue("DefaultQueue");
+            RabbitQueue sourceQueue = _sourceQueue ?? bus.DeclareQueue(DEFAULT_SOURCE_QUEUE_NAME);
             if (_isAbstract)
             {
                 return new NetqRabbitConsumer<TData>(bus, sourceQueue, _abstractDeserializer, LoggerFactory, _converter);
