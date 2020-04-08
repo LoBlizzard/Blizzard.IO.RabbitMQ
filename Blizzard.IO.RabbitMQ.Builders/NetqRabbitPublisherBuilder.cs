@@ -9,6 +9,7 @@ namespace Blizzard.IO.RabbitMQ.Builders
 {
     public class NetqRabbitPublisherBuilder<TData> : BaseNetqRabbitBuilder
     {
+        private const string DEFAULT_DESTINATION_EXCHANGE_NAME = "DEFAULT_EXCHANGE";
         private RabbitExchange _destinationExchange = null;
         private ISerializer<TData> _serializer = new JsonSerializer<TData>();
         private string _routingKey = "/";
@@ -103,13 +104,10 @@ namespace Blizzard.IO.RabbitMQ.Builders
         public NetqRabbitPublisher<TData> Build()
         {
             IBus bus = InitConnection();
+            RabbitExchange destinationExchange = _destinationExchange ??
+                bus.DeclareExchange(DEFAULT_DESTINATION_EXCHANGE_NAME, RabbitExchangeType.Fanout);
 
-            if (_destinationExchange == null)
-            {
-                _destinationExchange = bus.DeclareExchange("DefaultExchange", RabbitExchangeType.Fanout);
-            }
-
-            return new NetqRabbitPublisher<TData>(bus, _serializer, _destinationExchange, LoggerFactory, _converter,
+            return new NetqRabbitPublisher<TData>(bus, _serializer, destinationExchange, LoggerFactory, _converter,
                 _isAbstract, _routingKey);
         }
     }
