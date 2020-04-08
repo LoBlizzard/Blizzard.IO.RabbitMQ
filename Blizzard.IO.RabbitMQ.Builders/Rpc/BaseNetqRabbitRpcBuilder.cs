@@ -1,14 +1,13 @@
 ﻿using Blizzard.IO.Core.Rpc;
 using System.Collections.Generic;
 using Blizzard.IO.RabbitMQ.Rpc;
-using System;
 using Blizzard.IO.RabbitMQ.Entities.Rpc;
 using Microsoft.Extensions.Logging;
 using Blizzard.IO.Serialization.Rpc;
 
 namespace Blizzard.IO.RabbitMQ.Builders.Rpc
 {
-    public class BaseNetqRabbitRpcBuilder
+    public abstract class BaseNetqRabbitRpcBuilder
     {
         private static Dictionary<RpcConnectionId, INetqRabbitRpcConnection> netqRpcConnections = new Dictionary<RpcConnectionId, INetqRabbitRpcConnection>();
 
@@ -51,6 +50,14 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
             netqRpcConnections.Add(busKey, rpcConnection);
 
             return rpcConnection;
+        }
+
+        public static void CloseConnections()
+        {
+            foreach (INetqRabbitRpcConnection connection in netqRpcConnections.Values)
+            {
+                connection.Dispose();
+            }
         }
     }
 }

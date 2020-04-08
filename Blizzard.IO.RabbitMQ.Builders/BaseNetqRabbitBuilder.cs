@@ -41,5 +41,13 @@ namespace Blizzard.IO.RabbitMQ.Builders
 
             return bus;
         }
+
+        public static void CloseConnections()
+        {
+            foreach (var connection in netqRabbitConnections.Values)
+            {
+                connection.Dispose();
+            }
+        }
     }
 }

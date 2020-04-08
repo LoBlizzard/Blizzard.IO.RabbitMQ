@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Blizzard.IO.RabbitMQ.Rpc
 {
-    public class NetqRabbitRpcConnection : INetqRabbitRpcConnection, IDisposable
+    public class NetqRabbitRpcConnection : INetqRabbitRpcConnection
     {
         public IBus Bus { get; }
         public RpcMessageType RpcMessageType { get; }
