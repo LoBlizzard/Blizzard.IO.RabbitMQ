@@ -19,5 +19,10 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
             RpcMessageType = rpcMessageType;
             SerializerType = serializerType;
         }
+
+        public override string ToString()
+        {
+            return $"Host:{Hostname}; Username:{Username}; Password:{Password}; RpcMessageType:{RpcMessageType}; SerializerType:{SerializerType.FullName}";
+        }
     }
 }
