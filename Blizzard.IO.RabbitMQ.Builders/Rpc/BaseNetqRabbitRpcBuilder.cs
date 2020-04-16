@@ -12,11 +12,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
         private static Dictionary<RpcConnectionId, INetqRabbitRpcConnection> netqRpcConnections = new Dictionary<RpcConnectionId, INetqRabbitRpcConnection>();
 
         protected ISerializer Serializer = new JsonSerializer();
-        protected RpcConfiguration RpcConfiguration = new RpcConfiguration
-        {
-            ExchangeNameProvider = type => "RPC_EXCHANGE",
-            RoutingKeyProvider = type => type.ToString()
-        };
+        protected RpcConfiguration RpcConfiguration = new RpcConfiguration();
         protected RpcMessageType RpcMessageType = RpcMessageType.Concrete;
         protected string Hostname = "localhost";
         protected string Password = "guest";

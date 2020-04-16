@@ -7,15 +7,31 @@ namespace Blizzard.IO.RabbitMQ.Rpc
 {
     public class RpcRabbitWrapper : EasyNetqRpc
     {
-        public RpcRabbitWrapper(RpcConfiguration configuration, ConnectionConfiguration connectionConfiguration, IAdvancedBus advancedBus, IEventBus eventBus, IConventions conventions, 
-            IExchangeDeclareStrategy exchangeDeclareStrategy, IMessageDeliveryModeStrategy messageDeliveryModeStrategy, ITimeoutStrategy timeoutStrategy, 
-            ITypeNameSerializer typeNameSerializer) : base(connectionConfiguration, advancedBus, eventBus, conventions, exchangeDeclareStrategy, 
+        public RpcRabbitWrapper(RpcConfiguration configuration, ConnectionConfiguration connectionConfiguration, IAdvancedBus advancedBus, IEventBus eventBus, IConventions conventions,
+            IExchangeDeclareStrategy exchangeDeclareStrategy, IMessageDeliveryModeStrategy messageDeliveryModeStrategy, ITimeoutStrategy timeoutStrategy,
+            ITypeNameSerializer typeNameSerializer) : base(connectionConfiguration, advancedBus, eventBus, conventions, exchangeDeclareStrategy,
                 messageDeliveryModeStrategy, timeoutStrategy, typeNameSerializer)
         {
-            RpcExchangeNameConvention exchangeNameProvider = type=>configuration.ExchangeNameProvider(type);
-            RpcRoutingKeyNamingConvention routingKeyProvider = type => configuration.RoutingKeyProvider(type);
-            conventions.RpcRequestExchangeNamingConvention = exchangeNameProvider;
-            conventions.RpcRoutingKeyNamingConvention = routingKeyProvider;
+            if (configuration.RequestExchangeNameProvider != null)
+            {
+                RpcExchangeNameConvention requestExchangeNameProvider = type => configuration.RequestExchangeNameProvider(type);
+                conventions.RpcRequestExchangeNamingConvention = requestExchangeNameProvider;
+            }
+            if (configuration.RoutingKeyProvider!=null)
+            {
+                RpcRoutingKeyNamingConvention routingKeyProvider = type => configuration.RoutingKeyProvider(type);
+                conventions.RpcRoutingKeyNamingConvention = routingKeyProvider;
+            }
+            if (configuration.ResponseExchangeNameProvider != null)
+            {
+                RpcExchangeNameConvention responseExchangeNameProvider = type => configuration.ResponseExchangeNameProvider(type);
+                conventions.RpcResponseExchangeNamingConvention = responseExchangeNameProvider;
+            }
+            if (configuration.ReturnQueueNameProvider!=null)
+            {
+                RpcReturnQueueNamingConvention returnQueueNamingConvention = () => configuration.ReturnQueueNameProvider();
+                conventions.RpcReturnQueueNamingConvention = returnQueueNamingConvention;
+            }
         }
     }
 }
