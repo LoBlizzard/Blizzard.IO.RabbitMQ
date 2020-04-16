@@ -1,8 +1,6 @@
 ﻿using Blizzard.IO.Core;
 using Blizzard.IO.RabbitMQ.Entities;
 using EasyNetQ;
-using System;
-using System.Collections.Generic;
 
 namespace Blizzard.IO.RabbitMQ
 {
@@ -12,22 +10,36 @@ namespace Blizzard.IO.RabbitMQ
     {
         public MessageProperties Convert(RabbitMessageProperties rabbitMessageProperties)
         {
-            return new MessageProperties
+            return new MessageProperties()
             {
-                DeliveryMode = rabbitMessageProperties.DeliveryMode,
-                Type = rabbitMessageProperties.Type,
-                Headers = rabbitMessageProperties.Headers,
-                ContentType = rabbitMessageProperties.ContentType,
-                ContentEncoding = rabbitMessageProperties.ContentEncoding,
-                MessageId = rabbitMessageProperties.MessageId,
-                CorrelationId = rabbitMessageProperties.CorrelationId,
-                ReplyTo = rabbitMessageProperties.ReplyTo,
-                Timestamp = rabbitMessageProperties.Timestamp,
-                UserId = rabbitMessageProperties.UserId,
                 AppId = rabbitMessageProperties.AppId,
+                AppIdPresent = rabbitMessageProperties.AppId!= null,
                 ClusterId = rabbitMessageProperties.ClusterId,
+                ClusterIdPresent = rabbitMessageProperties.ClusterId != null,
+                ContentEncoding = rabbitMessageProperties.ContentEncoding,
+                ContentEncodingPresent = rabbitMessageProperties.ContentEncoding != null,
+                ContentType = rabbitMessageProperties.ContentType,
+                ContentTypePresent = rabbitMessageProperties.ContentType != null,
+                CorrelationId = rabbitMessageProperties.CorrelationId,
+                CorrelationIdPresent = rabbitMessageProperties.CorrelationId != null,
+                DeliveryMode = rabbitMessageProperties.DeliveryMode ?? 0 ,
+                DeliveryModePresent = rabbitMessageProperties.DeliveryMode != null,
+                Type = rabbitMessageProperties.Type,
+                TypePresent = rabbitMessageProperties.Type != null,
+                MessageId = rabbitMessageProperties.MessageId,
+                MessageIdPresent = rabbitMessageProperties.MessageId != null,
+                Headers = rabbitMessageProperties.Headers,
+                HeadersPresent = rabbitMessageProperties.Headers != null,
+                Timestamp = rabbitMessageProperties.Timestamp ?? 0,
+                TimestampPresent = rabbitMessageProperties.Timestamp != null,
+                Priority = rabbitMessageProperties.Priority ?? 0,
+                PriorityPresent = rabbitMessageProperties.Priority != null,
+                UserId = rabbitMessageProperties.UserId,
+                UserIdPresent = rabbitMessageProperties.UserId != null,
                 Expiration = rabbitMessageProperties.Expiration,
-                Priority = rabbitMessageProperties.Priority
+                ExpirationPresent = rabbitMessageProperties.Expiration != null,
+                ReplyTo = rabbitMessageProperties.ReplyTo,
+                ReplyToPresent = rabbitMessageProperties.ReplyTo != null
             };
         }
 
