@@ -32,6 +32,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
         public BaseNetqRabbitRpcBuilder(ILoggerFactory loggerFactory)
         {
             LoggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger(GetType());
         }
 
         protected INetqRabbitRpcConnection InitConnection()
