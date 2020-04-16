@@ -14,23 +14,19 @@ namespace Blizzard.IO.RabbitMQ.Rpc
         {
             if (configuration.RequestExchangeNameProvider != null)
             {
-                RpcExchangeNameConvention requestExchangeNameProvider = type => configuration.RequestExchangeNameProvider(type);
-                conventions.RpcRequestExchangeNamingConvention = requestExchangeNameProvider;
+                conventions.RpcRequestExchangeNamingConvention = type => configuration.RequestExchangeNameProvider(type);
             }
             if (configuration.RoutingKeyProvider!=null)
             {
-                RpcRoutingKeyNamingConvention routingKeyProvider = type => configuration.RoutingKeyProvider(type);
-                conventions.RpcRoutingKeyNamingConvention = routingKeyProvider;
+                conventions.RpcRoutingKeyNamingConvention = type => configuration.RoutingKeyProvider(type);
             }
             if (configuration.ResponseExchangeNameProvider != null)
             {
-                RpcExchangeNameConvention responseExchangeNameProvider = type => configuration.ResponseExchangeNameProvider(type);
-                conventions.RpcResponseExchangeNamingConvention = responseExchangeNameProvider;
+                conventions.RpcResponseExchangeNamingConvention = type => configuration.ResponseExchangeNameProvider(type);
             }
             if (configuration.ReturnQueueNameProvider!=null)
             {
-                RpcReturnQueueNamingConvention returnQueueNamingConvention = () => configuration.ReturnQueueNameProvider();
-                conventions.RpcReturnQueueNamingConvention = returnQueueNamingConvention;
+                conventions.RpcReturnQueueNamingConvention = () => configuration.ReturnQueueNameProvider();
             }
         }
     }

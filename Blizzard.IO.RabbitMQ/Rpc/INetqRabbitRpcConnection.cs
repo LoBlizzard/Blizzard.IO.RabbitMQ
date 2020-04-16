@@ -10,13 +10,15 @@ namespace Blizzard.IO.RabbitMQ.Rpc
         IBus Bus { get; }
         RpcMessageType RpcMessageType { get; }
 
-        Func<Type,object> Request<TRequest>(TRequest request)
+        Func<Type, object> Request<TRequest>(TRequest request)
             where TRequest : class;
         Task<Func<Type, object>> RequestAsync<TRequest>(TRequest request)
             where TRequest : class;
-        IDisposable Respond<TRespond>(Func<Func<Type, object>, TRespond> callback)
-            where TRespond : class;
-        IDisposable RespondAsync<TRespond>(Func<Func<Type, object>, Task<TRespond>> callback)
-            where TRespond : class;
+        IDisposable Respond<TRequest, TRespond>(Func<Func<Type, object>, TRespond> callback)
+            where TRespond : class
+            where TRequest : class;
+        IDisposable RespondAsync<TRequest, TRespond>(Func<Func<Type, object>, Task<TRespond>> callback)
+            where TRespond : class
+            where TRequest : class;
     }
 }
