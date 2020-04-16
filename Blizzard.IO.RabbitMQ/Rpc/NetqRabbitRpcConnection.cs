@@ -90,37 +90,29 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             where TRespond : class
             where TRequest : class
         {
-            IDisposable handler;
-            if (!_routingKeyProviderExist)
-            {
-                var convetion = Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention;
-                Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention = type => _typeNameSerializer.Serialize(typeof(TRequest));
-                handler = Bus.Respond(callback);
-                Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention = convetion;
-            }
-            else
-            {
-                handler = Bus.Respond(callback);
-            }
-
-            return handler;
+            return DefaultRoutingKeyProviderReplacer<TRequest>(() => Bus.Respond(callback));
         }
 
         public IDisposable RespondAsync<TRequest, TRespond>(Func<Func<Type, object>, Task<TRespond>> callback)
             where TRespond : class
             where TRequest : class
         {
+            return DefaultRoutingKeyProviderReplacer<TRequest>(() => Bus.RespondAsync(callback));
+        }
+
+        private IDisposable DefaultRoutingKeyProviderReplacer<T>(Func<IDisposable> handlerProviderCallback)
+        {
             IDisposable handler;
             if (!_routingKeyProviderExist)
             {
-                var convetion = Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention;
-                Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention = type => _typeNameSerializer.Serialize(typeof(TRequest));
-                handler = Bus.RespondAsync(callback);
-                Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention = convetion;
+                RpcRoutingKeyNamingConvention originalRoutingKeyProvider = Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention;
+                Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention = type => _typeNameSerializer.Serialize(typeof(T));
+                handler = handlerProviderCallback();
+                Bus.Advanced.Conventions.RpcRoutingKeyNamingConvention = originalRoutingKeyProvider;
             }
             else
             {
-                handler = Bus.RespondAsync(callback);
+                handler = handlerProviderCallback();
             }
 
             return handler;
