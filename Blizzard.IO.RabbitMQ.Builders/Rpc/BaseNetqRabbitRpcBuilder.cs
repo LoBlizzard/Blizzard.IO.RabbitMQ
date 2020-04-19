@@ -10,6 +10,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
     public abstract class BaseNetqRabbitRpcBuilder
     {
         private static Dictionary<RpcConnectionId, INetqRabbitRpcConnection> netqRpcConnections = new Dictionary<RpcConnectionId, INetqRabbitRpcConnection>();
+        private ILogger _logger;
 
         protected ISerializer Serializer = new JsonSerializer();
         protected RpcConfiguration RpcConfiguration = new RpcConfiguration();
@@ -31,6 +32,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
         public BaseNetqRabbitRpcBuilder(ILoggerFactory loggerFactory)
         {
             LoggerFactory = loggerFactory;
+            _logger = loggerFactory.CreateLogger(GetType());
         }
 
         protected INetqRabbitRpcConnection InitConnection()
@@ -45,6 +47,7 @@ namespace Blizzard.IO.RabbitMQ.Builders.Rpc
                Serializer, RequestHeartbeat, (ushort)PrefetchCount,Timeout,PublisherConfirms, PersistentMessages, Product, Platform, VirtualHost);
             netqRpcConnections.Add(busKey, rpcConnection);
 
+            _logger.LogInformation($"Added new RPC connection. Id: {busKey}");
             return rpcConnection;
         }
 

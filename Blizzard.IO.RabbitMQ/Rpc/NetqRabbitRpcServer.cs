@@ -32,7 +32,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             }
             else if (_netqRabbitRpcConnection.RpcMessageType == RpcMessageType.Concrete)
             {
-                _respondHandler = _netqRabbitRpcConnection.Respond(func =>
+                _respondHandler = _netqRabbitRpcConnection.Respond<TRequest, TRespond>(func =>
                   {
                       TRequest request = (TRequest)func(typeof(TRequest));
                       return callback(request);
@@ -58,7 +58,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             }
             else if (_netqRabbitRpcConnection.RpcMessageType == RpcMessageType.Concrete)
             {
-                _respondHandler = _netqRabbitRpcConnection.RespondAsync(func =>
+                _respondHandler = _netqRabbitRpcConnection.RespondAsync<TRequest, TRespond>(func =>
                 {
                     TRequest request = (TRequest)func(typeof(TRequest));
                     return callback(request);
