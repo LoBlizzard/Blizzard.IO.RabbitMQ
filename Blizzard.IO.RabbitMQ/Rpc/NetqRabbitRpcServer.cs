@@ -28,7 +28,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             VerifyServerHasntStartedYet();
             if (_netqRabbitRpcConnection.RpcMessageType == RpcMessageType.Abstract)
             {
-                _respondHandler = _netqRabbitRpcConnection.Bus.Respond(callback);
+                _respondHandler = _netqRabbitRpcConnection.Bus.Respond<TRequest, TRespond>(callback);
             }
             else if (_netqRabbitRpcConnection.RpcMessageType == RpcMessageType.Concrete)
             {
@@ -54,7 +54,7 @@ namespace Blizzard.IO.RabbitMQ.Rpc
             VerifyServerHasntStartedYet();
             if (_netqRabbitRpcConnection.RpcMessageType == RpcMessageType.Abstract)
             {
-                _respondHandler = _netqRabbitRpcConnection.Bus.RespondAsync(callback);
+                _respondHandler = _netqRabbitRpcConnection.Bus.RespondAsync<TRequest, TRespond>(callback);
             }
             else if (_netqRabbitRpcConnection.RpcMessageType == RpcMessageType.Concrete)
             {

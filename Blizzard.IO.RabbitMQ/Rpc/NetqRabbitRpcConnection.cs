@@ -12,14 +12,17 @@ namespace Blizzard.IO.RabbitMQ.Rpc
     {
         public IBus Bus { get; }
         public RpcMessageType RpcMessageType { get; }
-        private readonly bool _routingKeyProviderExist = false;
-        private readonly ITypeNameSerializer _typeNameSerializer = new DefaultTypeNameSerializer();
+        private readonly bool _routingKeyProviderExist;
+        private readonly ITypeNameSerializer _typeNameSerializer;
         private readonly ILogger<NetqRabbitRpcConnection> _logger;
 
         public NetqRabbitRpcConnection(RpcConfiguration configuration, string hostname, string username, string password, ILoggerFactory loggerFactory,
             ISerializer serializer, int heartBeat = 10, int preFetch = 50, ushort timeout = 10, bool publisherConfirms = false, bool persistent = true,
             string product = null, string platform = null, string virtualHost = null, RpcMessageType rpcMessageType = RpcMessageType.Concrete)
         {
+            _routingKeyProviderExist = false;
+            _typeNameSerializer = new DefaultTypeNameSerializer();
+
             _logger = loggerFactory.CreateLogger<NetqRabbitRpcConnection>();
             RpcMessageType = rpcMessageType;
 
